@@ -8,6 +8,7 @@ const url = require('url')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let componentPanel
+let entitylistPanel
 var isDiamondOpen = false
 
 function startUp() {
@@ -60,20 +61,39 @@ function startUp() {
             deleteEntityQueue = []
 
             // TODO: update entities
-            // console.log(entities)
+            console.log(entities)
             for (entity in entities) {
                 //
             }
         }
 
         // Open editor panels
-        createComponentPanel()
+        createEntityListPanel()
 
         // Fire up the engine
         Diamond.launch(update)
         Diamond.cleanUp()
         isDiamondOpen = false
     }
+}
+
+function createEntityListPanel() {
+    entitylistPanel = new BrowserWindow({
+        width: 300,
+        height: 800,
+        x: 0,
+        y: 0
+    })
+
+    entitylistPanel.loadURL(url.format({
+        pathname: path.join(__dirname, 'entitylist-panel.html'),
+        protocol: 'file:',
+        slashes: true
+    }))
+
+    entitylistPanel.on('closed', () => {
+        entitylistPanel = null
+    })
 }
 
 function createComponentPanel () {
@@ -132,8 +152,8 @@ app.on('will-quit', () => {
 app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (componentPanel === null) {
-        createComponentPanel()
+    if (entitylistPanel === null) {
+        createEntityListPanel()
     }
 })
 
