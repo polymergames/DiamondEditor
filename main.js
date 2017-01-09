@@ -1,4 +1,5 @@
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
+const {app, BrowserWindow} = electron
 const Diamond = require('jdiamond')
 
 const path = require('path')
@@ -7,19 +8,87 @@ const url = require('url')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let componentPanel
+var isDiamondOpen = false
 
 function startUp() {
     if (Diamond.init()) {
+        isDiamondOpen = true
+
+        var entities = {}
+
+        // Use queues so that entities are only created/destroyed/changed
+        // during game update callback
+        var newEntityQueue = []
+        var deleteEntityQueue = []
+        var updateEntityQueue = []
+
+        global.createEntity = function(name = "entity") {
+            newEntityQueue.push(name)
+        }
+
+        global.destroyEntity = function(name) {
+            deleteEntityQueue.push(name)
+        }
+
+        // resolution and coordinates for the Diamond game window
+        const resolution = Diamond.renderer.resolution
+        const middle = Diamond.Vector2.scalarVec(resolution, {x: 0.5, y: 0.5})
+
+        // this will run every frame in the Diamond engine game loop
+        const update = function() {
+            // Create new entities
+            for (var i = 0; i < newEntityQueue.length; ++i) {
+                // Only create a new entity if one doesn't already exist by that name
+                if (!entities.hasOwnProperty(newEntityQueue[i])) {
+                    entities[newEntityQueue[i]] = {
+                        transform: new Diamond.Transform2(middle)
+                    }
+                }
+            }
+            newEntityQueue = []
+
+            // Destroy deleted entities
+            for (var i = 0; i < deleteEntityQueue.length; ++i) {
+                if (entities.hasOwnProperty(deleteEntityQueue[i])) {
+                    for (var prop in entities[deleteEntityQueue[i]]) {
+                        // assumes that all game entity properties have a destroy() function
+                        entities[deleteEntityQueue[i]][prop].destroy()
+                    }
+                    delete entities[deleteEntityQueue[i]]
+                }
+            }
+            deleteEntityQueue = []
+
+            // TODO: update entities
+            // console.log(entities)
+            for (entity in entities) {
+                //
+            }
+        }
+
+        // Open editor panels
         createComponentPanel()
 
-        Diamond.launch()
+        // Fire up the engine
+        Diamond.launch(update)
         Diamond.cleanUp()
+        isDiamondOpen = false
     }
 }
 
 function createComponentPanel () {
     // Create the browser window.
-    componentPanel = new BrowserWindow({width: 300, height: 800})
+    // TODO: use title bar style hidden (for OSX only hehe) and implement drag in CSS
+    // http://electron.atom.io/docs/api/frameless-window/
+    // TODO: figure out how to position windows properly
+    // const pos = electron.screen.getPrimaryDisplay().workAreaSize
+    // pos.width -= 250
+    // pos.height -= 300
+    // console.log(pos)
+    componentPanel = new BrowserWindow({
+        width: 300,
+        height: 800
+    })
 
     // and load the index.html of the app.
     componentPanel.loadURL(url.format({
@@ -48,6 +117,15 @@ app.on('window-all-closed', () => {
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
         app.quit()
+    }
+})
+
+app.on('will-quit', () => {
+    // Close Diamond when editor is quitting
+    if (isDiamondOpen) {
+        Diamond.quit()
+        // Diamond.cleanUp will happen in startUp thread
+        isDiamondOpen = false
     }
 })
 
