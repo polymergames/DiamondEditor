@@ -61,7 +61,7 @@ function startUp() {
             deleteEntityQueue = []
 
             // TODO: update entities
-            console.log(entities)
+            // console.log(entities)
             for (entity in entities) {
                 //
             }
@@ -86,7 +86,7 @@ function createEntityListPanel() {
     })
 
     entitylistPanel.loadURL(url.format({
-        pathname: path.join(__dirname, 'entitylist-panel.html'),
+        pathname: path.join(__dirname, 'public/entitylist-panel.html'),
         protocol: 'file:',
         slashes: true
     }))
@@ -112,7 +112,7 @@ function createComponentPanel () {
 
     // and load the index.html of the app.
     componentPanel.loadURL(url.format({
-        pathname: path.join(__dirname, 'component-panel.html'),
+        pathname: path.join(__dirname, 'public/component-panel.html'),
         protocol: 'file:',
         slashes: true
     }))
