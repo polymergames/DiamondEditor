@@ -1,5 +1,43 @@
-@body-bg: #000;
+@body-bg: #21252b;
+@text-color: #9da5b4;
+
+@button-text-color: @text-color;
+@button-font-size: 16px;
+@button-bg: @body-bg;
+
+@vectical-spacing: 4px;
 
 body {
-  background-color: @body-bg;
+    background-color: @body-bg;
+    color: @text-color;
+}
+
+button, ul {
+    margin-top: @vectical-spacing;
+    margin-bottom: 0;
+}
+
+button {
+    background-color: @button-bg;
+    border: none;
+    color: @button-text-color;
+    font-size: @button-font-size;
+}
+
+ul {
+    padding-left: 20px;
+    padding-top: @vectical-spacing;
+    padding-bottom: 0;
+}
+
+.AddButton {
+    display: block;
+    text-align: right;
+    // margin-left: auto;
+    // margin-right: 0;
+    // float: right;
+}
+
+.VerticalList {
+    list-style-type: none;
 }
