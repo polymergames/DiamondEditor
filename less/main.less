@@ -3,25 +3,27 @@
 @font: sans-serif;
 @font-size: 14px;
 
-@padding-left: 4px;
+@padding-left: 8px;
+@padding-right: @padding-left;
 @vertical-spacing: 4px;
 
 @button-text-color: @text-color;
 @button-font-size: @font-size;
 @button-bg: @background-color;
 
-@selected-bg: #fff;
+@selected-text-color: #d7dae0;
+@selected-bg: #2C313A;
 
 body {
+    margin: 0px;
     background-color: @background-color;
     color: @text-color;
     font-family: @font;
     font-size: @font-size;
 }
 
-button, ul {
-    margin-top: 0px;
-    margin-bottom: 0px;
+div, button, ul {
+    margin: 0px;
 }
 
 button {
@@ -31,28 +33,29 @@ button {
     font-size: @button-font-size;
 }
 
-ul {
-    padding-left: @padding-left;
-    padding-bottom: 0px;
-}
-
-li {
-    margin-top: @vertical-spacing;
-    margin-bottom: 0px;
-}
-
 .add-button-container {
     display: block;
     text-align: right;
-    // margin-left: auto;
-    // margin-right: 0;
-    // float: right;
-}
-
-.selected-item {
-    background-color: @selected-bg;
 }
 
 .vertical-list {
+    cursor: default;
+    margin-top: @vertical-spacing;
+}
+
+.vertical-list ul {
+    padding: 0px;
     list-style-type: none;
+}
+
+.vertical-list ul li {
+    padding-left: @padding-left;
+    padding-right: @padding-right;
+    padding-top: @vertical-spacing / 2;
+    padding-bottom: @vertical-spacing / 2;
+}
+
+.selected-item {
+    color: @selected-text-color;
+    background-color: @selected-bg;
 }

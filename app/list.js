@@ -1,20 +1,22 @@
 import React from 'react'
 import {Button} from './button'
-import {Selectable} from './label'
 
 // TODO: allow multiple selections (ex. holding Shift/Cmd))
 /**
- * Prop items should be an array of {key, item} objects,
- * where each item will be rendered inside a list element with key=key.
+ * Prop items should be an array of {id, item} objects,
+ * where each item will be rendered inside a list element with key=id.
  *
- * Prop onSelect will be called when an item is selected
- * with the item's key given as an argument.
+ * optional Prop onSelect will be called when an item is selected
+ * with the item's id given as an argument.
  *
- * Prop onDeselect will be called when an item is deselected
+ * optional Prop onDeselect will be called when an item is deselected
  * (ie, it was selected and is no longer selected)
- * with the item's key given as an argument.
+ * with the item's id given as an argument.
  *
- * Prop selected can be given as a key that should be initially selected.
+ * optional Prop selected can be given as an id that should be initially selected.
+ *
+ * Applies css class selectable-list-item on list items, in addition to
+ * selected-item on the currently selected list item.
  */
 exports.SelectableList = class SelectableList extends React.Component {
   constructor(props) {
@@ -27,26 +29,40 @@ exports.SelectableList = class SelectableList extends React.Component {
     this.onClick = this.onClick.bind(this)
   }
 
-  onClick(e, key) {
-    this.setState(() => {
-      selected: key
-    })
-    this.props.onSelect(key)
+  onClick(e, id) {
+    // send callback if another item is currently selected
+    if (this.state.selected &&
+        this.props.onDeselect &&
+        this.state.selected != id) {
+      this.props.onDeselect(this.state.selected)
+    }
+
+    // set the currently selected item
+    this.setState(() => ({
+      selected: id
+    }))
+
+    // send callback for the newly selected item
+    if (this.props.onSelect)
+      this.props.onSelect(id)
   }
 
   render() {
+    // console.log(this.prop)
     return (
-      <ul className="vertical-list">
-        {this.props.items.map(item =>
-          <li key={item.key}>
-            <Selectable
-              selected={this.state.selected == item.key}
-              onClick={this.onClick}
-              key={item.key}
-              content={item.item}
-            />
+      <ul>
+        {this.props.items.map(item => (
+          <li
+            key={item.id}
+            className={
+              'selectable-list-item' +
+              (item.id == this.state.selected ? ' selected-item' : '')
+            }
+            onClick={e => this.onClick(e, item.id)}
+          >
+            {item.item}
           </li>
-        )}
+        ))}
       </ul>
     )
   }
