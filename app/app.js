@@ -6,19 +6,11 @@ import {DynamicList} from './list'
 
 const electron = require('electron')
 
-// class Search extends React.Component {
-//     render() {
-//         return (
-//           <p>
-//             <input type = "text" />
-//             <input type = "submit" />
-//           </p>
-//         )
-//     }
-// }
-
 // Render to ID content in the DOM
-ReactDOM.render( <DynamicList /> ,
+ReactDOM.render(
+  <DynamicList
+    newItem={() => ({key: Math.random(), item: Math.random()})}
+  />,
   document.getElementById('content')
 )
 

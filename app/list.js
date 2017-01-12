@@ -1,47 +1,41 @@
 import React from 'react'
 import {Button} from './button'
 
-class VerticalList extends React.Component {
-  render() {
-    const listItems = this.props.elements.map((element) =>
-      <li>{element}</li>
-    )
-
-    return (
-      <ul className="VerticalList">{listItems}</ul>
-    )
-  }
-}
-
 exports.DynamicList = class DynamicList extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      items: ['hi']
+      items: []
     }
 
     // This binding is necessary to make `this` work in the callback
     // Do this in constructor instead of when providing callback
     // to prevent constructing a new function at every render
-    this.addElement = this.addElement.bind(this);
+    this.addItem = this.addItem.bind(this);
   }
 
-  addElement(e) {
-    console.log("TODO: ADDING")
+  addItem(e) {
+    this.setState(prevState => {
+      // Get a new list item from client
+      const newItem = this.props.newItem(e, prevState.items)
+      // Update the list
+      return {
+        items: prevState.items.concat([<li key={newItem.key}>{newItem.item}</li>])
+      }
+    })
   }
 
   render() {
-    // Note: binding is necessary to make `this` work in a callback
     return (
-    <div>
-      <div className="AddButton">
-        <Button content="+" onClick={this.addElement} />
-      </div>
       <div>
-        <VerticalList elements={this.state.items} />
+        <div className="add-button-container">
+          <Button content="+" onClick={this.addItem} />
+        </div>
+        <ul className="vertical-list">
+          {this.state.items}
+        </ul>
       </div>
-    </div>
     )
   }
 }
