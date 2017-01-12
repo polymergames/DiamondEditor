@@ -1,13 +1,11 @@
 import React from 'react'
 
-exports.Label = class Label extends React.Component {
+exports.Selectable = class Selectable extends React.Component {
   render() {
     return (
-      <span>{this.props.content}</span>
+      <span onClick={this.props.onClick} className={this.props.selected ? 'selected-bg' : ''}>
+        {this.props.content}
+      </span>
     )
   }
-}
-
-
-exports.EditableLabel = class EditableLabel extends Label {
 }
