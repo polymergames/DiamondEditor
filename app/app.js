@@ -1,20 +1,21 @@
 require('../less/main.less') // allows hot-reloading of less
+const electron = require('electron')
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {SelectableList, DynamicList} from './list'
+import {DynamicSelectableList} from './list'
 
-const electron = require('electron')
 
 const messages = ['hi', 'hello', 'sup man']
 
 // Render to ID content in the DOM
 ReactDOM.render(
   <div className="vertical-list">
-    <SelectableList
+    <DynamicSelectableList
       items={messages.map(message =>
-        ({id: message, item: message})
+        ({id: message, value: message})
       )}
+      addButtonContent="+"
     />
   </div>,
   document.getElementById('content')

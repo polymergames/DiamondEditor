@@ -3,8 +3,8 @@ import {Button} from './button'
 
 // TODO: allow multiple selections (ex. holding Shift/Cmd))
 /**
- * Prop items should be an array of {id, item} objects,
- * where each item will be rendered inside a list element with key=id.
+ * Prop items should be an array of {id, value} objects,
+ * where each value will be rendered inside a list element with key=id.
  *
  * optional Prop onSelect will be called when an item is selected
  * with the item's id given as an argument.
@@ -18,7 +18,7 @@ import {Button} from './button'
  * Applies css class selectable-list-item on list items, in addition to
  * selected-item on the currently selected list item.
  */
-exports.SelectableList = class SelectableList extends React.Component {
+export class SelectableList extends React.Component {
   constructor(props) {
     super(props)
 
@@ -60,7 +60,7 @@ exports.SelectableList = class SelectableList extends React.Component {
             }
             onClick={e => this.onClick(e, item.id)}
           >
-            {item.item}
+            {item.value}
           </li>
         ))}
       </ul>
@@ -68,41 +68,71 @@ exports.SelectableList = class SelectableList extends React.Component {
   }
 }
 
-// TODO: use a given list implementation like SelectableList
-exports.DynamicList = class DynamicList extends React.Component {
+
+/**
+ * A Selectable list with a button to add new items.
+ *
+ * Prop items is an initial array of {id, value} objects
+ * where each value will be rendered in a SelectableList
+ *
+ * Prop newItem is a callback function that is called when the add button
+ * is clicked. It is passed an array of the current items in the list
+ * and a callback function addItem. addItem should be called by the client
+ * with an {id, value} object argument as a new item to add to the list.
+ *
+ * Prop addButtonContent will be displayed in the add item button.
+ *
+ * Props onSelect, onDeselect, and selected are passed as the
+ * corresponding props to SelectableList.
+ *
+ * Applies css class add-button-container to the add item button.
+ *
+ * See SelectableList for more info about the contained list.
+ *
+ */
+export class DynamicSelectableList extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      items: []
+      items: this.props.items
     }
 
-    // This binding is necessary to make `this` work in the callback
-    // Do this in constructor instead of when providing callback
-    // to prevent constructing a new function at every render
     this.addItem = this.addItem.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
-  addItem(e) {
+  addItem(item) {
     this.setState(prevState => {
-      // Get a new list item from client
-      const newItem = this.props.newItem(e, prevState.items)
       // Update the list
       return {
-        items: prevState.items.concat([<li key={newItem.key}>{newItem.item}</li>])
+        items: prevState.items.concat([newItem])
       }
     })
+  }
+
+  // for button
+  onClick(e) {
+    // Let client pass a new list item
+    // to the addItem function
+    if (this.props.newItem)
+      this.props.newItem(this.state.items, this.addItem)
   }
 
   render() {
     return (
       <div>
         <div className="add-button-container">
-          <Button content="+" onClick={this.addItem} />
+          <Button content={this.props.addButtonContent} onClick={this.onClick} />
         </div>
-        <ul className="vertical-list">
-          {this.state.items}
-        </ul>
+        <SelectableList
+          items={this.state.items.map(item =>
+            ({id: item.id, value: item.value})
+          )}
+          onSelect={this.props.onSelect}
+          onDeselect={this.props.onDeselect}
+          selected={this.props.selected}
+        />
       </div>
     )
   }
