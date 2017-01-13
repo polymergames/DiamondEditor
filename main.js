@@ -61,7 +61,7 @@ function startUp() {
       deleteEntityQueue = []
 
       // TODO: update entities
-      // console.log(entities)
+      console.log(entities)
       for (entity in entities) {
         //
       }

@@ -75,10 +75,10 @@ export class SelectableList extends React.Component {
  * Prop items is an initial array of {id, value} objects
  * where each value will be rendered in a SelectableList
  *
- * Prop newItem is a callback function that is called when the add button
- * is clicked. It is passed an array of the current items in the list
- * and a callback function addItem. addItem should be called by the client
- * with an {id, value} object argument as a new item to add to the list.
+ * Prop newItem is a callback function that is called when the add item button
+ * is clicked. It is passed a callback function addItem and
+ * an array of the current items in the list. The callback addItem should be called
+ * by the client with an {id, value} object argument as a new item to add to the list.
  *
  * Prop addButtonContent will be displayed in the add item button.
  *
@@ -95,7 +95,7 @@ export class DynamicSelectableList extends React.Component {
     super(props)
 
     this.state = {
-      items: this.props.items
+      items: this.props.items ? this.this.props.items : []
     }
 
     this.addItem = this.addItem.bind(this);
@@ -106,7 +106,7 @@ export class DynamicSelectableList extends React.Component {
     this.setState(prevState => {
       // Update the list
       return {
-        items: prevState.items.concat([newItem])
+        items: prevState.items.concat([item])
       }
     })
   }
@@ -116,7 +116,7 @@ export class DynamicSelectableList extends React.Component {
     // Let client pass a new list item
     // to the addItem function
     if (this.props.newItem)
-      this.props.newItem(this.state.items, this.addItem)
+      this.props.newItem(this.addItem, this.state.items)
   }
 
   render() {
