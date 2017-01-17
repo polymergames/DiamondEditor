@@ -1,5 +1,4 @@
-const electron = require('electron')
-const {app, BrowserWindow} = electron
+const {app, BrowserWindow} = require('electron')
 const Diamond = require('jdiamond')
 
 const path = require('path')
@@ -11,6 +10,7 @@ let entitylistPanel = null
 let componentPanel = null
 
 let isDiamondOpen = false
+let currentlyDisplayedEntity = null // the name of the entity currently active on the componentPanel
 
 
 function startUp() {
@@ -49,7 +49,7 @@ function startUp() {
       if (componentPanel == null) {
         createComponentPanel()
       }
-      // TODO: set the entity displayed by component panel
+      currentlyDisplayedEntity = name
     }
 
     // resolution and coordinates for the Diamond game window
@@ -98,6 +98,17 @@ function startUp() {
       for (entity in entities) {
         //
       }
+
+      // update the entity display in the component panel
+      if (componentPanel && currentlyDisplayedEntity) {
+        componentPanel.webContents.send(
+          'setEntity',
+          {
+            name: currentlyDisplayedEntity,
+            entity: entityObj(entities[currentlyDisplayedEntity])
+          }
+        )
+      }
     }
 
     // Open editor panels
@@ -108,6 +119,17 @@ function startUp() {
     Diamond.cleanUp()
     isDiamondOpen = false
   }
+}
+
+
+// returns an object containing all the component.obj objects
+// of the components in the given entity
+function entityObj(entity) {
+  ret = {}
+  for (let component in entity) {
+    ret[component] = entity[component].obj
+  }
+  return ret
 }
 
 
