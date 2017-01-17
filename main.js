@@ -7,28 +7,49 @@ const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let componentPanel
-let entitylistPanel
-var isDiamondOpen = false
+let entitylistPanel = null
+let componentPanel = null
+
+let isDiamondOpen = false
+
 
 function startUp() {
   if (Diamond.init()) {
     isDiamondOpen = true
 
-    var entities = {}
+    // set of entity objects. an entity object contains component objects.
+    let entities = {}
 
     // Use queues so that entities are only created/destroyed/changed
     // during game update callback
-    var newEntityQueue = []
-    var deleteEntityQueue = []
-    var updateEntityQueue = []
+    let newEntityQueue = [] // each element is a name
+    let deleteEntityQueue = []
+    let updateEntityQueue = [] // each element is an object containing a name and an entity (containing component objects)
+    let deleteComponentQueue = [] // each element is {entityName, componentName}
 
-    global.createEntity = function(name = "entity") {
+    global.createEntity = function(name) {
       newEntityQueue.push(name)
     }
 
     global.destroyEntity = function(name) {
       deleteEntityQueue.push(name)
+    }
+
+    global.updateEntity = function(name, entity) {
+      updateEntityQueue.push({name: name, entity: entity})
+    }
+
+    global.removeEntityComponent = function(entityName, componentName) {
+      deleteComponentQueue.push(
+        {entityName: entityName, componentName: componentName}
+      )
+    }
+
+    global.openEntity = function(name) {
+      if (componentPanel == null) {
+        createComponentPanel()
+      }
+      // TODO: set the entity displayed by component panel
     }
 
     // resolution and coordinates for the Diamond game window
@@ -38,7 +59,7 @@ function startUp() {
     // this will run every frame in the Diamond engine game loop
     const update = function() {
       // Create new entities
-      for (var i = 0; i < newEntityQueue.length; ++i) {
+      for (let i = 0; i < newEntityQueue.length; ++i) {
         // Only create a new entity if one doesn't already exist by that name
         if (!entities.hasOwnProperty(newEntityQueue[i])) {
           entities[newEntityQueue[i]] = {
@@ -49,9 +70,9 @@ function startUp() {
       newEntityQueue = []
 
       // Destroy deleted entities
-      for (var i = 0; i < deleteEntityQueue.length; ++i) {
+      for (let i = 0; i < deleteEntityQueue.length; ++i) {
         if (entities.hasOwnProperty(deleteEntityQueue[i])) {
-          for (var prop in entities[deleteEntityQueue[i]]) {
+          for (let prop in entities[deleteEntityQueue[i]]) {
             // assumes that all game entity properties have a destroy() function
             entities[deleteEntityQueue[i]][prop].destroy()
           }
@@ -59,6 +80,18 @@ function startUp() {
         }
       }
       deleteEntityQueue = []
+
+      // Update entity components
+      for (let i = 0; i < updateEntityQueue.length; ++i) {
+        let name = updateEntityQueue[i].name
+        let entity = updateEntityQueue[i].entity
+        if (entities.hasOwnProperty(name)) {
+          for (let component in entity) {
+            entities[name][component].set(entity[component])
+          }
+        }
+      }
+      updateEntityQueue = []
 
       // TODO: update entities
       console.log(entities)
@@ -76,6 +109,7 @@ function startUp() {
     isDiamondOpen = false
   }
 }
+
 
 function createEntityListPanel() {
   entitylistPanel = new BrowserWindow({
@@ -95,6 +129,7 @@ function createEntityListPanel() {
     entitylistPanel = null
   })
 }
+
 
 function createComponentPanel () {
   // Create the browser window.
@@ -126,6 +161,7 @@ function createComponentPanel () {
   })
 }
 
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -156,6 +192,3 @@ app.on('activate', () => {
     createEntityListPanel()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

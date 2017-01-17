@@ -1,11 +1,12 @@
 var webpack = require('webpack');
 module.exports = {
 entry: {
-  app: ['webpack/hot/dev-server', './app/app.js'],
+  entityApp: ['webpack/hot/dev-server', './app/entityApp.js'],
+  componentApp: ['webpack/hot/dev-server', './app/componentApp.js']
 },
 output: {
   path: './public/js',
-  filename: 'bundle.js',
+  filename: '[name].bundle.js',
   publicPath: 'http://localhost:8080/built/'
 },
 devServer: {
