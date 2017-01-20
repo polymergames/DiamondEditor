@@ -17,6 +17,12 @@ function startUp() {
   if (Diamond.init()) {
     isDiamondOpen = true
 
+    // DEBUG
+    // add react developer tools
+    BrowserWindow.addDevToolsExtension(
+      '~/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
+    )
+
     // set of entity objects. an entity object contains component objects.
     let entities = {}
 
@@ -173,12 +179,6 @@ function createComponentPanel () {
     protocol: 'file:',
     slashes: true
   }))
-
-  // DEBUG
-  // add react developer tools
-  componentPanel.addDevToolsExtension(
-    '~/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
-  )
 
   // Emitted when the window is closed.
   componentPanel.on('closed', () => {
