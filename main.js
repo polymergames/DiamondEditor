@@ -174,6 +174,12 @@ function createComponentPanel () {
     slashes: true
   }))
 
+  // DEBUG
+  // add react developer tools
+  componentPanel.addDevToolsExtension(
+    '~/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
+  )
+
   // Emitted when the window is closed.
   componentPanel.on('closed', () => {
     // Dereference the window object, usually you would store windows
