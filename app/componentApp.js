@@ -9,7 +9,7 @@ import {LabeledField} from './input'
 
 ipcRenderer.on('setEntity', (event, data) => {
   ReactDOM.render(
-    <div>
+    <div className="component-panel">
       <p>{data.name}</p>
 
       <p>Position:</p>
@@ -19,7 +19,7 @@ ipcRenderer.on('setEntity', (event, data) => {
       />
 
       <LabeledField
-        label='Rotation:'
+        label='Rotation'
         value={data.entity.transform.rotation}
         onChange={(val) => {}}
       />

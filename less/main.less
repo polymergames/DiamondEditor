@@ -22,7 +22,7 @@ body {
     font-size: @font-size;
 }
 
-div, button, ul {
+div, button, ul, p {
     margin: 0px;
 }
 
@@ -31,6 +31,29 @@ button {
     border: none;
     color: @button-text-color;
     font-size: @button-font-size;
+}
+
+.component-panel {
+    margin-top: @vertical-spacing;
+}
+
+.component-panel p {
+    padding-left: @padding-left;
+    margin-bottom: 2 * @vertical-spacing;
+}
+
+.component-panel div {
+    margin-bottom: 2 * @vertical-spacing;
+}
+
+.component-panel label {
+    display: block;
+    margin-left: @padding-left;
+    margin-bottom: @vertical-spacing;
+}
+
+.component-panel input {
+    margin-left: @padding-left / 2;
 }
 
 .add-button-container {

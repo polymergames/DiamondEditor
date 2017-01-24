@@ -1,6 +1,9 @@
 const {app, BrowserWindow} = require('electron')
 const Diamond = require('jdiamond')
 
+// TODO: remove this from release
+const installExtension = require('electron-devtools-installer')
+
 const path = require('path')
 const url = require('url')
 
@@ -12,16 +15,24 @@ let componentPanel = null
 let isDiamondOpen = false
 let currentlyDisplayedEntity = null // the name of the entity currently active on the componentPanel
 
-
 function startUp() {
+  // DEBUG
+  // TODO: remove this from release
+  // add react developer tools
+  // BrowserWindow.addDevToolsExtension(
+  //   '~/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
+  // )
+  installExtension.default(installExtension.REACT_DEVELOPER_TOOLS)
+    .then((name) => {
+      console.log(`Added Extension:  ${name}`)
+      startDiamond()
+    })
+    .catch((err) => console.log('An error occurred: ', err))
+}
+
+function startDiamond() {
   if (Diamond.init()) {
     isDiamondOpen = true
-
-    // DEBUG
-    // add react developer tools
-    BrowserWindow.addDevToolsExtension(
-      '~/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
-    )
 
     // set of entity objects. an entity object contains component objects.
     let entities = {}
@@ -100,7 +111,7 @@ function startUp() {
       updateEntityQueue = []
 
       // TODO: update entities
-      console.log(entities)
+      // console.log(entities)
       for (entity in entities) {
         //
       }
