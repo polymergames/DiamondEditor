@@ -38,9 +38,9 @@ export class SelectableList extends React.Component {
     }
 
     // set the currently selected item
-    this.setState(() => ({
+    this.setState({
       selected: id
-    }))
+    })
 
     // send callback for the newly selected item
     if (this.props.onSelect)

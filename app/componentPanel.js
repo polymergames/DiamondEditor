@@ -1,3 +1,4 @@
+// TODO: destroy this file
 import React from 'react'
 import {ObjectPanel} from './panel'
 import {LabeledField} from './input'

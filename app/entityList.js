@@ -1,5 +1,4 @@
-const electron = require('electron')
-
+import electron from 'electron'
 import React from 'react'
 import {DynamicSelectableList} from './list'
 

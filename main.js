@@ -44,6 +44,7 @@ function startDiamond() {
     let updateEntityQueue = [] // each element is an object containing a name and an entity (containing component objects)
     let deleteComponentQueue = [] // each element is {entityName, componentName}
 
+    // will only create an entity if one doesn't already exist by that name
     global.createEntity = function(name) {
       newEntityQueue.push(name)
     }
@@ -52,7 +53,14 @@ function startDiamond() {
       deleteEntityQueue.push(name)
     }
 
+    // will perform a shallow merge of the provided entity object with the
+    // existing entity, ie.
+    // will update the properties of the named entity to those present in the
+    // given entity object- the entity object passed here only needs to contain
+    // the properties being modified, any properties that are not included will
+    // not be deleted or changed.
     global.updateEntity = function(name, entity) {
+      console.log('Updating entity named ' + name + ', entity: ' + entity)
       updateEntityQueue.push({name: name, entity: entity})
     }
 
@@ -100,20 +108,23 @@ function startDiamond() {
 
       // Update entity components
       for (let i = 0; i < updateEntityQueue.length; ++i) {
+        console.log(updateEntityQueue[i])
         let name = updateEntityQueue[i].name
         let entity = updateEntityQueue[i].entity
         if (entities.hasOwnProperty(name)) {
           for (let component in entity) {
+            // console.log("Setting component " + component)
             entities[name][component].set(entity[component])
           }
         }
       }
       updateEntityQueue = []
 
-      // TODO: update entities
+      // DEBUG
       // console.log(entities)
       for (entity in entities) {
-        //
+        console.log(entity)
+        console.log(entities[entity].transform.obj)
       }
 
       // update the entity display in the component panel

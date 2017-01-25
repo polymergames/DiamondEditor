@@ -1,43 +1,15 @@
 import React from 'react'
 
-export class Checkbox extends React.Component {
-  constructor(props) {
-    super(props)
-    this.handleChange = this.handleChange.bind(this)
-  }
-
-  handleChange(e) {
-    this.props.onChange(e.target.checked)
-  }
-
+export class LabeledField extends React.Component {
   render() {
     return (
-      <input
-        type="checkbox"
-        checked={this.props.value}
-        onChange={this.handleChange}
-      />
-    )
-  }
-}
-
-export class InputField extends React.Component {
-  constructor(props) {
-    super(props)
-    this.handleChange = this.handleChange.bind(this)
-  }
-
-  handleChange(e) {
-    this.props.onChange(e.target.value)
-  }
-
-  render() {
-    return (
-      <input
-        type={this.props.type}
-        value={this.props.value}
-        onChange={this.handleChange}
-      />
+      <label>
+        {this.props.label}
+        <TypedField
+          value={this.props.value}
+          onChange={this.props.onChange}
+        />
+      </label>
     )
   }
 }
@@ -77,16 +49,44 @@ export class TypedField extends React.Component {
   }
 }
 
-export class LabeledField extends React.Component {
+export class Checkbox extends React.Component {
+  constructor(props) {
+    super(props)
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  handleChange(e) {
+    this.props.onChange(e.target.checked)
+  }
+
   render() {
     return (
-      <label>
-        {this.props.label}
-        <TypedField
-          value={this.props.value}
-          onChange={this.props.onChange}
-        />
-      </label>
+      <input
+        type="checkbox"
+        checked={this.props.value}
+        onChange={this.handleChange}
+      />
+    )
+  }
+}
+
+export class InputField extends React.Component {
+  constructor(props) {
+    super(props)
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  handleChange(e) {
+    this.props.onChange(e.target.value)
+  }
+
+  render() {
+    return (
+      <input
+        type={this.props.type}
+        value={this.props.value}
+        onChange={this.handleChange}
+      />
     )
   }
 }

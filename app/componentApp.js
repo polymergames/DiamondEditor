@@ -1,14 +1,11 @@
 require('../less/main.less') // allows hot-reloading of less
-
-const {ipcRenderer} = require('electron')
-
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {TransformPanel} from './componentPanel'
+import {EntityPanel} from './entityPanel'
 
-ipcRenderer.on('setEntity', (event, data) => {
-  ReactDOM.render(
-    <ComponentPanel transform={data.entity.transform} />,
-    document.getElementById('content')
-  )
-})
+ReactDOM.render(
+  <div className="component-panel">
+    <EntityPanel/>
+  </div>,
+  document.getElementById('content')
+)
