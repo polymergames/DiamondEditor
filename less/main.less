@@ -14,6 +14,8 @@
 @selected-text-color: #d7dae0;
 @selected-bg: #2C313A;
 
+@menu-bg: #282c34;
+
 body {
     margin: 0px;
     background-color: @background-color;
@@ -85,10 +87,19 @@ button {
 }
 
 .dropdown-menu .menu-component {
+    background-color: @menu-bg;
     padding-left: @padding-left;
+    padding-right: @padding-right;
     cursor: default;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
 .dropdown-menu .menu-component-item {
-    
+    padding-top: @vertical-spacing / 2;
+    padding-bottom: @vertical-spacing / 2;
+}
+
+.dropdown-menu .menu-component-item:hover {
+    color: @selected-text-color;
+    background-color: @selected-bg;
 }
