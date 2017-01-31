@@ -1,6 +1,7 @@
 import electron, {ipcRenderer} from 'electron'
 import React from 'react'
 import {ObjectPanel} from './panel'
+import {Dropdown} from './dropdown'
 
 // Diamond functions
 const electronUpdateEntity = electron.remote.getGlobal('updateEntity')
@@ -16,9 +17,10 @@ export class EntityPanel extends React.Component {
     }
 
     this.setEntity = this.setEntity.bind(this)
+    this.createComponent = this.createComponent.bind(this)
   }
 
-  componentWillMount() {
+  componentDidMount() {
     ipcRenderer.on(entityChannel, this.setEntity)
   }
 
@@ -35,6 +37,10 @@ export class EntityPanel extends React.Component {
     })
   }
 
+  createComponent(e) {
+    //
+  }
+
   render() {
     // regarding onChange:
     // rather than changing this component's state,
@@ -42,11 +48,17 @@ export class EntityPanel extends React.Component {
     // This component will always reflect the state sent from
     // ipcRenderer's channel entityChannel.
     return (
-      <ObjectPanel
-        label={this.state.name}
-        object={this.state.entity}
-        onChange={electronUpdateEntity}
-      />
+      <div>
+        <ObjectPanel
+          label={this.state.name}
+          object={this.state.entity}
+          onChange={electronUpdateEntity}
+        />
+        <Dropdown button="+">
+          <p>Swag</p>
+          <p>Yolo</p>
+        </Dropdown>
+      </div>
     )
   }
 }

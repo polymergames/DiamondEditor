@@ -85,7 +85,7 @@ export class SelectableList extends React.Component {
  * Props onSelect, onDeselect, and selected are passed as the
  * corresponding props to SelectableList.
  *
- * Applies css class add-button-container to the add item button.
+ * Applies css class add-button-container to the add item button's div container.
  *
  * See SelectableList for more info about the contained list.
  *
@@ -94,6 +94,7 @@ export class DynamicSelectableList extends React.Component {
   constructor(props) {
     super(props)
 
+    // TODO: remove unnecessary state
     this.state = {
       items: this.props.items ? this.this.props.items : []
     }
