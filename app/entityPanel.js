@@ -2,6 +2,7 @@ import electron, {ipcRenderer} from 'electron'
 import React from 'react'
 import {ObjectPanel} from './panel'
 import {Dropdown} from './dropdown'
+import {Menu} from './menu'
 
 // Diamond functions
 const electronUpdateEntity = electron.remote.getGlobal('updateEntity')
@@ -54,10 +55,11 @@ export class EntityPanel extends React.Component {
           object={this.state.entity}
           onChange={electronUpdateEntity}
         />
-        <Dropdown button="+">
-          <p>Swag</p>
-          <p>Yolo</p>
-        </Dropdown>
+        <div className='dropdown-menu'>
+          <Dropdown button="+">
+            <Menu items={['swag', 'yolo']} onClick={item => {console.log(item + ' clicked!')}} />
+          </Dropdown>
+        </div>
       </div>
     )
   }
