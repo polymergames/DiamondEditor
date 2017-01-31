@@ -6,6 +6,7 @@ import {Menu} from './menu'
 
 // Diamond functions
 const electronUpdateEntity = electron.remote.getGlobal('updateEntity')
+const electronCreateComponent = electron.remote.getGlobal('createEntityComponent')
 const entityChannel = 'setEntity'
 
 export class EntityPanel extends React.Component {
@@ -38,8 +39,8 @@ export class EntityPanel extends React.Component {
     })
   }
 
-  createComponent(e) {
-    //
+  createComponent(componentName) {
+    electronCreateComponent(this.state.name, componentName)
   }
 
   render() {
@@ -57,7 +58,12 @@ export class EntityPanel extends React.Component {
         />
         <div className='dropdown-menu'>
           <Dropdown button="+">
-            <Menu items={['swag', 'yolo']} onClick={item => {console.log(item + ' clicked!')}} />
+            <Menu
+              items={[
+                'renderComponent',
+                'particleEmitter'
+              ]}
+              onClick={this.createComponent} />
           </Dropdown>
         </div>
       </div>

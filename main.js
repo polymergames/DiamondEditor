@@ -42,6 +42,7 @@ function startDiamond() {
     let newEntityQueue = [] // each element is a name
     let deleteEntityQueue = []
     let updateEntityQueue = [] // each element is an object containing a name and an entity (containing component objects)
+    let newComponentQueue = [] // each element is {entityName, componentName}
     let deleteComponentQueue = [] // each element is {entityName, componentName}
 
     // will only create an entity if one doesn't already exist by that name
@@ -62,6 +63,12 @@ function startDiamond() {
     global.updateEntity = function(name, entity) {
       console.log('Updating entity named ' + name + ', entity: ' + entity)
       updateEntityQueue.push({name: name, entity: entity})
+    }
+
+    global.createEntityComponent = function(entityName, componentName) {
+      newComponentQueue.push(
+        {entityName: entityName, componentName: componentName}
+      )
     }
 
     global.removeEntityComponent = function(entityName, componentName) {
@@ -94,17 +101,20 @@ function startDiamond() {
       }
       newEntityQueue = []
 
-      // Destroy deleted entities
-      for (let i = 0; i < deleteEntityQueue.length; ++i) {
-        if (entities.hasOwnProperty(deleteEntityQueue[i])) {
-          for (let prop in entities[deleteEntityQueue[i]]) {
-            // assumes that all game entity properties have a destroy() function
-            entities[deleteEntityQueue[i]][prop].destroy()
-          }
-          delete entities[deleteEntityQueue[i]]
+      // Create new components
+      for (let i = 0; i < newComponentQueue.length; ++i) {
+        let entity = newComponentQueue[i].entityName
+        let component = newComponentQueue[i].componentName
+        // check that the entity exists and that it doesn't
+        // already have the component being created.
+        if (entities.hasOwnProperty(entity) &&
+            !entities[entity].hasOwnProperty(component)) {
+          newComponent = createDefaultComponent(Diamond, entity, component)
+          if (newComponent)
+            entity[component] = newComponent
         }
       }
-      deleteEntityQueue = []
+      newComponentQueue = []
 
       // Update entity components
       for (let i = 0; i < updateEntityQueue.length; ++i) {
@@ -119,6 +129,21 @@ function startDiamond() {
         }
       }
       updateEntityQueue = []
+
+      // Destroy removed components
+      // TODO
+
+      // Destroy deleted entities
+      for (let i = 0; i < deleteEntityQueue.length; ++i) {
+        if (entities.hasOwnProperty(deleteEntityQueue[i])) {
+          for (let prop in entities[deleteEntityQueue[i]]) {
+            // assumes that all game entity properties have a destroy() function
+            entities[deleteEntityQueue[i]][prop].destroy()
+          }
+          delete entities[deleteEntityQueue[i]]
+        }
+      }
+      deleteEntityQueue = []
 
       // DEBUG
       // console.log(entities)
@@ -158,6 +183,21 @@ function entityObj(entity) {
     ret[component] = entity[component].obj
   }
   return ret
+}
+
+function createDefaultComponent(entity, componentName) {
+  switch (componentName) {
+    case 'renderComponent':
+    // TODO pass default texture
+      return new Diamond.RenderComponent2D(entity.transform, null)
+      break;
+    case 'particleEmitter':
+    // TODO: pass default particle emitter config
+      return new Diamond.ParticleEmitter2D({}, entity.transform)
+      break;
+    default:
+      return null
+  }
 }
 
 

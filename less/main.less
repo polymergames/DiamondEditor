@@ -14,7 +14,10 @@
 @selected-text-color: #d7dae0;
 @selected-bg: #2C313A;
 
-@menu-bg: #282c34;
+@menu-bg: #bbbbbf;
+@menu-text-color: #000;
+@menu-selected-bg: #747379;
+@menu-selected-text-color: #fff;
 
 body {
     margin: 0px;
@@ -87,19 +90,21 @@ button {
 }
 
 .dropdown-menu .menu-component {
+    padding-left: 0px;
+    color: @menu-text-color;
     background-color: @menu-bg;
-    padding-left: @padding-left;
-    padding-right: @padding-right;
     cursor: default;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
 .dropdown-menu .menu-component-item {
+    padding-left: @padding-left;
+    padding-right: @padding-right;
     padding-top: @vertical-spacing / 2;
     padding-bottom: @vertical-spacing / 2;
 }
 
 .dropdown-menu .menu-component-item:hover {
-    color: @selected-text-color;
-    background-color: @selected-bg;
+    color: @menu-selected-text-color;
+    background-color: @menu-selected-bg;
 }
