@@ -5,8 +5,8 @@ import {Dropdown} from './dropdown'
 import {Menu} from './menu'
 
 // Diamond functions
-const electronUpdateEntity = electron.remote.getGlobal('updateEntity')
-const electronCreateComponent = electron.remote.getGlobal('createEntityComponent')
+const diamondUpdateEntity = electron.remote.getGlobal('updateEntity')
+const diamondCreateComponent = electron.remote.getGlobal('createEntityComponent')
 const entityChannel = 'setEntity'
 
 export class EntityPanel extends React.Component {
@@ -24,6 +24,7 @@ export class EntityPanel extends React.Component {
 
   componentDidMount() {
     ipcRenderer.on(entityChannel, this.setEntity)
+    ipcRenderer.send(entityChannel, 'needEntity')
   }
 
   componentWillUnmount() {
@@ -40,7 +41,7 @@ export class EntityPanel extends React.Component {
   }
 
   createComponent(componentName) {
-    electronCreateComponent(this.state.name, componentName)
+    diamondCreateComponent(this.state.name, componentName)
   }
 
   render() {
@@ -54,7 +55,7 @@ export class EntityPanel extends React.Component {
         <ObjectPanel
           label={this.state.name}
           object={this.state.entity}
-          onChange={electronUpdateEntity}
+          onChange={diamondUpdateEntity}
         />
         <div className='dropdown-menu'>
           <Dropdown button="+">

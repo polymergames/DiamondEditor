@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron')
+const {app, ipcMain, BrowserWindow} = require('electron')
 const Diamond = require('jdiamond')
 
 // TODO: remove this from release
@@ -7,13 +7,17 @@ const installExtension = require('electron-devtools-installer')
 const path = require('path')
 const url = require('url')
 
+const entityChannel = 'setEntity'
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let entitylistPanel = null
 let componentPanel = null
 
 let isDiamondOpen = false
-let currentlyDisplayedEntity = null // the name of the entity currently active on the componentPanel
+
+let defaultTexture = null
+let defaultTexturePath = 'assets/default.png'
 
 function startUp() {
   // DEBUG
@@ -45,6 +49,22 @@ function startDiamond() {
     let newComponentQueue = [] // each element is {entityName, componentName}
     let deleteComponentQueue = [] // each element is {entityName, componentName}
 
+    // the name of the entity currently active on the componentPanel
+    let currentlyDisplayedEntityName = null
+    let displayedEntityNeedsUpdate = false
+
+    // updates the entity currently displayed in the component panel
+    const updateDisplayedEntity = function(entityName) {
+      componentPanel.webContents.send(
+        entityChannel,
+        {
+          name: entityName,
+          entity: entityObj(entities[entityName])
+        }
+      )
+      displayedEntityNeedsUpdate = false
+    }
+
     // will only create an entity if one doesn't already exist by that name
     global.createEntity = function(name) {
       newEntityQueue.push(name)
@@ -61,7 +81,6 @@ function startDiamond() {
     // the properties being modified, any properties that are not included will
     // not be deleted or changed.
     global.updateEntity = function(name, entity) {
-      console.log('Updating entity named ' + name + ', entity: ' + entity)
       updateEntityQueue.push({name: name, entity: entity})
     }
 
@@ -69,6 +88,7 @@ function startDiamond() {
       newComponentQueue.push(
         {entityName: entityName, componentName: componentName}
       )
+      displayedEntityNeedsUpdate = true
     }
 
     global.removeEntityComponent = function(entityName, componentName) {
@@ -77,16 +97,19 @@ function startDiamond() {
       )
     }
 
-    global.openEntity = function(name) {
+    global.openEntity = function(entityName) {
       if (componentPanel == null) {
         createComponentPanel()
       }
-      currentlyDisplayedEntity = name
+      currentlyDisplayedEntityName = entityName
+      updateDisplayedEntity(currentlyDisplayedEntityName)
     }
 
-    // resolution and coordinates for the Diamond game window
-    const resolution = Diamond.renderer.resolution
-    const middle = Diamond.Vector2.scalarVec(resolution, {x: 0.5, y: 0.5})
+    // receive messages from component panel window
+    ipcMain.on(entityChannel, function(event, message) {
+      if (message == 'needEntity')
+        updateDisplayedEntity(currentlyDisplayedEntityName)
+    })
 
     // this will run every frame in the Diamond engine game loop
     const update = function() {
@@ -94,31 +117,31 @@ function startDiamond() {
       for (let i = 0; i < newEntityQueue.length; ++i) {
         // Only create a new entity if one doesn't already exist by that name
         if (!entities.hasOwnProperty(newEntityQueue[i])) {
-          entities[newEntityQueue[i]] = {
-            transform: new Diamond.Transform2(middle)
-          }
+          // entities[newEntityQueue[i]] = {
+          //   transform: new Diamond.Transform2(screenMiddle)
+          // }
+          entities[newEntityQueue[i]] = {}
         }
       }
       newEntityQueue = []
 
       // Create new components
       for (let i = 0; i < newComponentQueue.length; ++i) {
-        let entity = newComponentQueue[i].entityName
-        let component = newComponentQueue[i].componentName
+        let entityName = newComponentQueue[i].entityName
+        let componentName = newComponentQueue[i].componentName
         // check that the entity exists and that it doesn't
         // already have the component being created.
-        if (entities.hasOwnProperty(entity) &&
-            !entities[entity].hasOwnProperty(component)) {
-          newComponent = createDefaultComponent(Diamond, entity, component)
+        if (entities.hasOwnProperty(entityName) &&
+            !entities[entityName].hasOwnProperty(componentName)) {
+          newComponent = createDefaultComponent(entities[entityName], componentName)
           if (newComponent)
-            entity[component] = newComponent
+            entities[entityName][componentName] = newComponent
         }
       }
       newComponentQueue = []
 
       // Update entity components
       for (let i = 0; i < updateEntityQueue.length; ++i) {
-        console.log(updateEntityQueue[i])
         let name = updateEntityQueue[i].name
         let entity = updateEntityQueue[i].entity
         if (entities.hasOwnProperty(name)) {
@@ -148,19 +171,16 @@ function startDiamond() {
       // DEBUG
       // console.log(entities)
       for (entity in entities) {
-        console.log(entity)
-        console.log(entities[entity].transform.obj)
+        // console.log(entity)
+        // console.log(entities[entity].transform.obj)
+        // console.log(entities[entity])
       }
 
       // update the entity display in the component panel
-      if (componentPanel && currentlyDisplayedEntity) {
-        componentPanel.webContents.send(
-          'setEntity',
-          {
-            name: currentlyDisplayedEntity,
-            entity: entityObj(entities[currentlyDisplayedEntity])
-          }
-        )
+      if (componentPanel &&
+          currentlyDisplayedEntityName &&
+          displayedEntityNeedsUpdate) {
+        updateDisplayedEntity(currentlyDisplayedEntityName)
       }
     }
 
@@ -185,14 +205,29 @@ function entityObj(entity) {
   return ret
 }
 
+function loadDefaultTexture() {
+  return Diamond.renderer.loadTexture(defaultTexturePath)
+}
+
+// creates a new Diamond component with default properties.
+// make sure the entity has the prerequisite components
+// to create the new component! ex., a lot of components
+// require an existing transform
 function createDefaultComponent(entity, componentName) {
   switch (componentName) {
+    case 'transform':
+      const screenMiddle =
+        Diamond.Vector2.scalarVec(Diamond.renderer.resolution, {x: 0.5, y: 0.5})
+      return new Diamond.Transform2(screenMiddle)
+      break;
     case 'renderComponent':
-    // TODO pass default texture
-      return new Diamond.RenderComponent2D(entity.transform, null)
+      if (!transform)       return null
+      if (!defaultTexture)  defaultTexture = loadDefaultTexture()
+      return new Diamond.RenderComponent2D(entity.transform, defaultTexture)
       break;
     case 'particleEmitter':
     // TODO: pass default particle emitter config
+      if (!transform)       return null
       return new Diamond.ParticleEmitter2D({}, entity.transform)
       break;
     default:

@@ -3,9 +3,10 @@ import React from 'react'
 import {DynamicSelectableList} from './list'
 
 // Diamond functions
-const createEntity = electron.remote.getGlobal('createEntity')
-const destroyEntity = electron.remote.getGlobal('destroyEntity')
-const openEntity = electron.remote.getGlobal('openEntity')
+const diamondCreateEntity = electron.remote.getGlobal('createEntity')
+const diamondDestroyEntity = electron.remote.getGlobal('destroyEntity')
+const diamondCreateComponent = electron.remote.getGlobal('createEntityComponent')
+const windowOpenEntity = electron.remote.getGlobal('openEntity')
 
 /**
  * Prop addButtonContent will be displayed in the add entity button.
@@ -19,15 +20,17 @@ export class EntityList extends React.Component {
   }
 
   addEntity(addItem) {
+    // create a new entity, add a transform to it,
+    // and display it in the entity list
     const name = 'entity' + this.currentID++
-    createEntity(name)
+    diamondCreateEntity(name)
+    diamondCreateComponent(name, 'transform')
     addItem({id: name, value: name})
   }
 
   onSelectEntity(entityName) {
-    // tell the electron app to display this entity
-    // in the entity editing window
-    openEntity(entityName)
+    // tell the entity editing window to display this entity
+    windowOpenEntity(entityName)
   }
 
   render() {
