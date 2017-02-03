@@ -171,8 +171,10 @@ function startDiamond() {
       // DEBUG
       // console.log(entities)
       for (entity in entities) {
-        // console.log(entity)
+        console.log(entity)
         // console.log(entities[entity].transform.obj)
+        for (let prop in entities[entity])
+          console.log(entities[entity][prop].obj)
         // console.log(entities[entity])
       }
 

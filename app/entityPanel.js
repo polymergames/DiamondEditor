@@ -19,6 +19,7 @@ export class EntityPanel extends React.Component {
     }
 
     this.setEntity = this.setEntity.bind(this)
+    this.handleChange = this.handleChange.bind(this)
     this.createComponent = this.createComponent.bind(this)
   }
 
@@ -40,22 +41,22 @@ export class EntityPanel extends React.Component {
     })
   }
 
+  handleChange(newName, newEntity) {
+    this.setState({name: newName, entity: newEntity})
+    diamondUpdateEntity(newName, newEntity)
+  }
+
   createComponent(componentName) {
     diamondCreateComponent(this.state.name, componentName)
   }
 
   render() {
-    // regarding onChange:
-    // rather than changing this component's state,
-    // the change is sent to the main electron process.
-    // This component will always reflect the state sent from
-    // ipcRenderer's channel entityChannel.
     return (
       <div>
         <ObjectPanel
           label={this.state.name}
           object={this.state.entity}
-          onChange={diamondUpdateEntity}
+          onChange={this.handleChange}
         />
         <div className='dropdown-menu'>
           <Dropdown button="+">
