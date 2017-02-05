@@ -1,6 +1,6 @@
 import electron, {ipcRenderer} from 'electron'
 import React from 'react'
-import {ObjectPanel} from './panel'
+import {ComponentPanel} from './componentPanel'
 import {Dropdown} from './dropdown'
 import {Menu} from './menu'
 
@@ -41,9 +41,13 @@ export class EntityPanel extends React.Component {
     })
   }
 
-  handleChange(newName, newEntity) {
-    this.setState({name: newName, entity: newEntity})
-    diamondUpdateEntity(newName, newEntity)
+  handleChange(componentName, newComponent) {
+    this.setState(prevState => {
+      let newEntity = prevState.entity
+      newEntity[componentName] = newComponent
+      diamondUpdateEntity(this.state.name, newEntity)
+      return {entity: newEntity}
+    })
   }
 
   createComponent(componentName) {
@@ -53,11 +57,16 @@ export class EntityPanel extends React.Component {
   render() {
     return (
       <div>
-        <ObjectPanel
-          label={this.state.name}
-          object={this.state.entity}
-          onChange={this.handleChange}
-        />
+        <p>{this.state.name}</p>
+        {Object.keys(this.state.entity).map(componentName => {
+          return (
+            <ComponentPanel
+              label={componentName}
+              object={this.state.entity[componentName]}
+              onChange={this.handleChange}
+            />
+          )
+        })}
         <div className='dropdown-menu'>
           <Dropdown button="+">
             <Menu
