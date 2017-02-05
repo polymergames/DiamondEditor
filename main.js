@@ -88,7 +88,6 @@ function startDiamond() {
       newComponentQueue.push(
         {entityName: entityName, componentName: componentName}
       )
-      displayedEntityNeedsUpdate = true
     }
 
     global.removeEntityComponent = function(entityName, componentName) {
@@ -136,6 +135,10 @@ function startDiamond() {
           newComponent = createDefaultComponent(entities[entityName], componentName)
           if (newComponent)
             entities[entityName][componentName] = newComponent
+
+          // update the displayed entity in the UI if necessary
+          displayedEntityNeedsUpdate = displayedEntityNeedsUpdate ||
+                                       entityName == currentlyDisplayedEntityName
         }
       }
       newComponentQueue = []
@@ -171,10 +174,10 @@ function startDiamond() {
       // DEBUG
       // console.log(entities)
       for (entity in entities) {
-        console.log(entity)
+        // console.log(entity)
         // console.log(entities[entity].transform.obj)
-        for (let prop in entities[entity])
-          console.log(entities[entity][prop].obj)
+        // for (let prop in entities[entity])
+        //   console.log(entities[entity][prop].obj)
         // console.log(entities[entity])
       }
 
@@ -223,13 +226,14 @@ function createDefaultComponent(entity, componentName) {
       return new Diamond.Transform2(screenMiddle)
       break;
     case 'renderComponent':
-      if (!transform)       return null
-      if (!defaultTexture)  defaultTexture = loadDefaultTexture()
+      if (!entity.transform)  return null
+      if (!defaultTexture)    defaultTexture = loadDefaultTexture()
+      if (!defaultTexture)    return null
       return new Diamond.RenderComponent2D(entity.transform, defaultTexture)
       break;
     case 'particleEmitter':
     // TODO: pass default particle emitter config
-      if (!transform)       return null
+      if (!transform) return null
       return new Diamond.ParticleEmitter2D({}, entity.transform)
       break;
     default:

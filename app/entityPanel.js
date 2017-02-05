@@ -65,7 +65,8 @@ export class EntityPanel extends React.Component {
                 'renderComponent',
                 'particleEmitter'
               ]}
-              onClick={this.createComponent} />
+              onClick={this.createComponent}
+            />
           </Dropdown>
         </div>
       </div>
