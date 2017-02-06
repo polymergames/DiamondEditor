@@ -43,9 +43,13 @@ export class EntityPanel extends React.Component {
 
   handleChange(componentName, newComponent) {
     this.setState(prevState => {
+      // update Diamond with the changed component
+      let entityChanges = {}
+      entityChanges[componentName] = newComponent
+      diamondUpdateEntity(this.state.name, entityChanges)
+      // update UI
       let newEntity = prevState.entity
       newEntity[componentName] = newComponent
-      diamondUpdateEntity(this.state.name, newEntity)
       return {entity: newEntity}
     })
   }
@@ -61,6 +65,7 @@ export class EntityPanel extends React.Component {
         {Object.keys(this.state.entity).map(componentName => {
           return (
             <ComponentPanel
+              key={componentName}
               label={componentName}
               object={this.state.entity[componentName]}
               onChange={this.handleChange}

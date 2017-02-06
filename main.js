@@ -1,4 +1,4 @@
-const {app, ipcMain, BrowserWindow} = require('electron')
+const {app, dialog, ipcMain, BrowserWindow} = require('electron')
 const Diamond = require('jdiamond')
 
 // TODO: remove this from release
@@ -16,8 +16,10 @@ let componentPanel = null
 
 let isDiamondOpen = false
 
-let defaultTexture = null
+let textureTable = {}
+
 let defaultTexturePath = 'assets/default.png'
+
 
 function startUp() {
   // DEBUG
@@ -104,6 +106,11 @@ function startDiamond() {
       updateDisplayedEntity(currentlyDisplayedEntityName)
     }
 
+    global.getTextureFromPath = getTextureFromPath
+    global.getTexturePathFromHandle = getTexturePathFromHandle
+
+    global.openFilePicker = openFilePicker
+
     // receive messages from component panel window
     ipcMain.on(entityChannel, function(event, message) {
       if (message == 'needEntity')
@@ -149,8 +156,26 @@ function startDiamond() {
         let entity = updateEntityQueue[i].entity
         if (entities.hasOwnProperty(name)) {
           for (let component in entity) {
-            // console.log("Setting component " + component)
-            entities[name][component].set(entity[component])
+            // TODO: this is a temporary fix for renderComponent
+            // when renderComponent sprite is changed with .set,
+            // it gets messed up :()
+            if (component == 'renderComponent' &&
+                entities[name].transform &&
+                entity[component].sprite) {
+              entities[name][component].destroy()
+              entities[name][component] = new Diamond.RenderComponent2D(
+                  entities[name].transform,
+                  entity[component].sprite
+              )
+              let newComponent = entities[name][component]
+              newComponent.layer = entity[component].layer
+              newComponent.pivot = entity[component].pivot
+              if (entity[component].isFlippedX) newComponent.flipX()
+              if (entity[component].isFlippedY) newComponent.flipY()
+            }
+            else {
+              entities[name][component].set(entity[component])
+            }
           }
         }
       }
@@ -200,6 +225,25 @@ function startDiamond() {
 }
 
 
+function getTextureFromPath(texturePath) {
+  let texture = textureTable[texturePath]
+  // load the texture for the first time
+  // if it's not already cached
+  if (!texture) {
+    texture = Diamond.renderer.loadTexture(texturePath)
+    textureTable[texturePath] = texture
+  }
+  return texture
+}
+
+function getTexturePathFromHandle(textureHandle) {
+  for (let path in textureTable) {
+    if (textureTable[path].handle == textureHandle)
+      return path
+  }
+  return null
+}
+
 // returns an object containing all the component.obj objects
 // of the components in the given entity
 function entityObj(entity) {
@@ -208,10 +252,6 @@ function entityObj(entity) {
     ret[component] = entity[component].obj
   }
   return ret
-}
-
-function loadDefaultTexture() {
-  return Diamond.renderer.loadTexture(defaultTexturePath)
 }
 
 // creates a new Diamond component with default properties.
@@ -227,8 +267,8 @@ function createDefaultComponent(entity, componentName) {
       break;
     case 'renderComponent':
       if (!entity.transform)  return null
-      if (!defaultTexture)    defaultTexture = loadDefaultTexture()
-      if (!defaultTexture)    return null
+      defaultTexture = getTextureFromPath(defaultTexturePath)
+      if (!defaultTexture) return null
       return new Diamond.RenderComponent2D(entity.transform, defaultTexture)
       break;
     case 'particleEmitter':
@@ -241,6 +281,14 @@ function createDefaultComponent(entity, componentName) {
   }
 }
 
+
+// opens the system dialog to open file(s).
+// passes the selected files(s) as an array of file paths to callback.
+function openFilePicker(callback) {
+  dialog.showOpenDialog({
+    properties: ['openFile']
+  }, callback)
+}
 
 function createEntityListPanel() {
   entitylistPanel = new BrowserWindow({
