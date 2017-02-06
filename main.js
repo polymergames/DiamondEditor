@@ -4,6 +4,7 @@ const Diamond = require('jdiamond')
 // TODO: remove this from release
 const installExtension = require('electron-devtools-installer')
 
+const fs = require('fs')
 const path = require('path')
 const url = require('url')
 
@@ -19,7 +20,7 @@ let isDiamondOpen = false
 let textureTable = {}
 
 let defaultTexturePath = 'assets/default.png'
-
+let defaultParticleConfigPath = 'assets/defaultParticles.json'
 
 function startUp() {
   // DEBUG
@@ -174,6 +175,9 @@ function startDiamond() {
               if (entity[component].isFlippedY) newComponent.flipY()
             }
             else {
+              console.log('Updating component ' + component)
+              console.log(entity[component])
+              console.log(entities[name][component])
               entities[name][component].set(entity[component])
             }
           }
@@ -268,13 +272,19 @@ function createDefaultComponent(entity, componentName) {
     case 'renderComponent':
       if (!entity.transform)  return null
       defaultTexture = getTextureFromPath(defaultTexturePath)
-      if (!defaultTexture) return null
+      if (!defaultTexture)    return null
       return new Diamond.RenderComponent2D(entity.transform, defaultTexture)
       break;
     case 'particleEmitter':
-    // TODO: pass default particle emitter config
-      if (!transform) return null
-      return new Diamond.ParticleEmitter2D({}, entity.transform)
+      if (!entity.transform)  return null
+      const configFile = fs.readFileSync(defaultParticleConfigPath)
+      if (configFile) {
+        return new Diamond.ParticleEmitter2D(JSON.parse(configFile), entity.transform)
+      }
+      else {
+        console.log('Failed to load particle config ' + defaultParticleConfigPath);
+        return null
+      }
       break;
     default:
       return null
@@ -320,7 +330,7 @@ function createComponentPanel () {
   // pos.height -= 300
   // console.log(pos)
   componentPanel = new BrowserWindow({
-    width: 300,
+    width: 350,
     height: 800
   })
 
