@@ -18,9 +18,9 @@ export class ComponentPanel extends React.Component {
       case 'renderComponent':
         PanelComponentVar = RenderComponentPanel
         break
-      // case 'particleEmitter':
-      //   PanelComponentVar = ParticleComponentPanel
-      //   break
+      case 'particleEmitter':
+        PanelComponentVar = ParticleComponentPanel
+        break
       default:
         PanelComponentVar = ObjectPanel
     }
@@ -100,10 +100,56 @@ class RenderComponentPanel extends React.Component {
 }
 
 class ParticleComponentPanel extends React.Component {
+  constructor(props) {
+    super(props)
+    this.openSprite = this.openSprite.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  // load a sprite from a file provided by the file picker
+  openSprite() {
+    openFilePicker(fileNames => {
+      if (fileNames.length > 0) {
+        let sprite = getTextureFromPath(fileNames[0])
+        if (sprite) {
+          let particleObj = this.props.object
+          particleObj.particleTexture = fileNames[0]
+          this.props.onChange(this.props.label, particleObj)
+        }
+        else {
+          console.log('Sprite ' + fileName + ' could not be loaded!');
+        }
+      }
+    })
+  }
+
+  handleChange(componentName, displayedObj) {
+    // the particleTexture value was removed from the displayed object,
+    // so it should be added back before sending to the parent
+    let particleObj = {}
+    copyObj(displayedObj, particleObj)
+    particleObj.particleTexture = this.props.object.particleTexture
+    this.props.onChange(componentName, particleObj)
+  }
+
   render() {
+    let spritePath = this.props.object.particleTexture
+
+    // remove the default display of the sprite path
+    let displayedObj = {}
+    copyObj(this.props.object, displayedObj)
+    delete displayedObj.particleTexture
+
     return (
       <div>
         <h3>{this.props.label}</h3>
+        <p>particleTexture: <span className="fileLink" onClick={this.openSprite}>{spritePath}</span></p>
+        <ObjectPanel
+          label={this.props.label}
+          hideLabel={true}
+          object={displayedObj}
+          onChange={this.handleChange}
+        />
       </div>
     )
   }
