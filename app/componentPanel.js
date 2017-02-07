@@ -24,11 +24,13 @@ export class ComponentPanel extends React.Component {
 
     if (PanelComponentVar) {
       return (
-        <PanelComponentVar
-          label={this.props.label}
-          object={this.props.object}
-          onChange={this.props.onChange}
-        />
+        <div className="component-panel">
+          <PanelComponentVar
+            label={this.props.label}
+            object={this.props.object}
+            onChange={this.props.onChange}
+          />
+        </div>
       )
     }
     return null

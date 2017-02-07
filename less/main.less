@@ -20,6 +20,9 @@
 @menu-selected-bg: #747379;
 @menu-selected-text-color: #fff;
 
+@border-color: @text-color;
+@border-width: 1px;
+
 body {
     margin: 0px;
     background-color: @background-color;
@@ -43,17 +46,24 @@ button {
     color: @link-color;
 }
 
-.component-panel {
+.entity-panel {
     margin-top: @vertical-spacing;
 }
 
-.component-panel p {
-    padding-left: @padding-left;
+.entity-panel p {
+    margin-left: @padding-left;
     margin-bottom: 2 * @vertical-spacing;
 }
 
-.component-panel div {
+.entity-panel div {
+    margin-top: 2 * @vertical-spacing;
     margin-bottom: 2 * @vertical-spacing;
+}
+
+.component-panel {
+    border-style: solid;
+    border-color: @border-color;
+    border-width: @border-width;
 }
 
 .component-panel label {

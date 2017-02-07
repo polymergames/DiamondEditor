@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 import {EntityPanel} from './entityPanel'
 
 ReactDOM.render(
-  <div className="component-panel">
+  <div className="entity-panel">
     <EntityPanel/>
   </div>,
   document.getElementById('content')
