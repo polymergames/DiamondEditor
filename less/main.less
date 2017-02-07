@@ -50,8 +50,15 @@ button {
     margin-top: @vertical-spacing;
 }
 
-.entity-panel p {
+.entity-panel p, h3 {
     margin-left: @padding-left;
+    margin-top: @vertical-spacing;
+    margin-bottom: @vertical-spacing;
+}
+
+.entity-panel h3 {
+    font-size: @font-size;
+    font-weight: normal;
     margin-bottom: 2 * @vertical-spacing;
 }
 
@@ -64,6 +71,10 @@ button {
     border-style: solid;
     border-color: @border-color;
     border-width: @border-width;
+}
+
+.component-panel div {
+    // margin-left: @padding-left;
 }
 
 .component-panel label {

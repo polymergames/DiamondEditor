@@ -18,6 +18,9 @@ export class ComponentPanel extends React.Component {
       case 'renderComponent':
         PanelComponentVar = RenderComponentPanel
         break
+      // case 'particleEmitter':
+      //   PanelComponentVar = ParticleComponentPanel
+      //   break
       default:
         PanelComponentVar = ObjectPanel
     }
@@ -37,7 +40,7 @@ export class ComponentPanel extends React.Component {
   }
 }
 
-export class RenderComponentPanel extends React.Component {
+class RenderComponentPanel extends React.Component {
   constructor(props) {
     super(props)
     this.openSprite = this.openSprite.bind(this)
@@ -83,7 +86,7 @@ export class RenderComponentPanel extends React.Component {
 
     return (
       <div>
-        <p>{this.props.label}</p>
+        <h3>{this.props.label}</h3>
         <p>sprite: <span className="fileLink" onClick={this.openSprite}>{spritePath}</span></p>
         <ObjectPanel
           label={this.props.label}
@@ -91,6 +94,16 @@ export class RenderComponentPanel extends React.Component {
           object={displayedObj}
           onChange={this.handleChange}
         />
+      </div>
+    )
+  }
+}
+
+class ParticleComponentPanel extends React.Component {
+  render() {
+    return (
+      <div>
+        <h3>{this.props.label}</h3>
       </div>
     )
   }

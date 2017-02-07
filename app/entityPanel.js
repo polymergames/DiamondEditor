@@ -59,11 +59,9 @@ export class EntityPanel extends React.Component {
   }
 
   render() {
-    console.log('Rendering');
-    console.log(this.state.entity);
     return (
       <div>
-        <p>{this.state.name}</p>
+        <h3>{this.state.name}</h3>
         {Object.keys(this.state.entity).map(componentName => {
           return (
             <ComponentPanel

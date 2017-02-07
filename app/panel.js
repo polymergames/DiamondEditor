@@ -9,7 +9,7 @@ export class ObjectPanel extends React.Component {
     // render a panel or field for each property of the object
     return (
       <div>
-        {!this.props.hideLabel && <p>{this.props.label}</p>}
+        {!this.props.hideLabel && <h3>{this.props.label}</h3>}
         {Object.keys(this.props.object).map(prop => {
           // recursively make object panel
           if (typeof this.props.object[prop] == 'object') {
