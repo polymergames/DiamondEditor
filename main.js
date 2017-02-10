@@ -19,8 +19,11 @@ let isDiamondOpen = false
 
 let textureTable = {}
 
-let defaultTexturePath = 'assets/default.png'
-let defaultParticleConfigPath = 'assets/defaultParticles.json'
+const defaultTexturePath = 'assets/default.png'
+const defaultParticleConfigPath = 'assets/defaultParticles.json'
+
+const debugColor = {r: 0, g: 255, b: 0, a: 100}
+const debugPointRadius = 1
 
 function startUp() {
   // DEBUG
@@ -118,6 +121,8 @@ function startDiamond() {
         updateDisplayedEntity(currentlyDisplayedEntityName)
     })
 
+
+    // === UPDATE ===
     // this will run every frame in the Diamond engine game loop
     const update = function() {
       // Create new entities
@@ -175,9 +180,9 @@ function startDiamond() {
               if (entity[component].isFlippedY) newComponent.flipY()
             }
             else {
-              console.log('Updating component ' + component)
-              console.log(entity[component])
-              console.log(entities[name][component])
+              // console.log('Updating component ' + component)
+              // console.log(entity[component])
+              // console.log(entities[name][component])
               entities[name][component].set(entity[component])
             }
           }
@@ -202,12 +207,29 @@ function startDiamond() {
 
       // DEBUG
       // console.log(entities)
-      for (entity in entities) {
+      for (entityName in entities) {
+        let entity = entities[entityName]
+        if (entityName === currentlyDisplayedEntityName) {
+          // mark the entity's position
+          if (entity.transform) {
+            Diamond.Debug.drawCircle({
+              center: entity.transform.position, radius: debugPointRadius
+            }, debugColor)
+          }
+          // draw circle component
+          // if (entity.circle) {
+          //   Diamond.Debug.drawCircle(entity.circle, debugColor)
+          // }
+          // draw polygon component
+          // if (entity.polygon) {
+          //   Diamond.Debug.drawPoly(entity.polygon.points, debugColor)
+          // }
+        }
+        // console.log(entityName)
+        // console.log(entity.transform.obj)
+        // for (let prop in entity)
+        //   console.log(entity[prop].obj)
         // console.log(entity)
-        // console.log(entities[entity].transform.obj)
-        // for (let prop in entities[entity])
-        //   console.log(entities[entity][prop].obj)
-        // console.log(entities[entity])
       }
 
       // update the entity display in the component panel
