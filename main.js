@@ -22,6 +22,7 @@ let textureTable = {}
 const defaultTexturePath = 'assets/default.png'
 const defaultParticleConfigPath = 'assets/defaultParticles.json'
 
+const defaultCircle = {center: {x: 0, y: 0}, radius: 50}
 const debugColor = {r: 0, g: 255, b: 0, a: 100}
 const debugPointRadius = 1
 
@@ -216,6 +217,13 @@ function startDiamond() {
               center: entity.transform.position, radius: debugPointRadius
             }, debugColor)
           }
+          // draw colliders
+          if (entity.circleCollider) {
+            Diamond.Debug.drawCircleCollider(entity.circleCollider, debugColor)
+          }
+          if (entity.polygonCollider) {
+            Diamond.Debug.drawPolyCollider(entity.polygonCollider, debugColor)
+          }
           // draw circle component
           // if (entity.circle) {
           //   Diamond.Debug.drawCircle(entity.circle, debugColor)
@@ -290,13 +298,13 @@ function createDefaultComponent(entity, componentName) {
       const screenMiddle =
         Diamond.Vector2.scalarVec(Diamond.renderer.resolution, {x: 0.5, y: 0.5})
       return new Diamond.Transform2(screenMiddle)
-      break;
+      break
     case 'renderComponent':
       if (!entity.transform)  return null
       defaultTexture = getTextureFromPath(defaultTexturePath)
       if (!defaultTexture)    return null
       return new Diamond.RenderComponent2D(entity.transform, defaultTexture)
-      break;
+      break
     case 'particleEmitter':
       if (!entity.transform)  return null
       const configFile = fs.readFileSync(defaultParticleConfigPath)
@@ -307,7 +315,16 @@ function createDefaultComponent(entity, componentName) {
         console.log('Failed to load particle config ' + defaultParticleConfigPath);
         return null
       }
-      break;
+      break
+    case 'circleCollider':
+      if (!entity.rigidbody) {
+        if (!entity.transform)  return null
+        // HACK
+        // add rigidbody to the entity if it doesn't already exist
+        entity.rigidbody = new Diamond.Rigidbody2D(entity.transform)
+      }
+      return new Diamond.CircleCollider(entity.rigidbody, defaultCircle)
+      break
     default:
       return null
   }

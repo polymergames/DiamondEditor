@@ -77,6 +77,7 @@ export class EntityPanel extends React.Component {
             <Menu
               items={[
                 'renderComponent',
+                'circleCollider',
                 'particleEmitter'
               ]}
               onClick={this.createComponent}

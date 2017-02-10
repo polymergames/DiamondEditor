@@ -77,7 +77,11 @@ export class InputField extends React.Component {
   }
 
   handleChange(e) {
-    this.props.onChange(e.target.value)
+    let val = e.target.value
+    if (this.props.type === 'number') {
+      val = parseFloat(val)
+    }
+    this.props.onChange(val)
   }
 
   render() {
