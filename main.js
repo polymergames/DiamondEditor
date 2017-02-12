@@ -23,6 +23,12 @@ const defaultTexturePath = 'assets/default.png'
 const defaultParticleConfigPath = 'assets/defaultParticles.json'
 
 const defaultCircle = {center: {x: 0, y: 0}, radius: 50}
+const defaultPolygon = [
+  {x: -15, y: -15},
+  {x: 0, y: 15},
+  {x: 15, y: -15}
+]
+
 const debugColor = {r: 0, g: 255, b: 0, a: 100}
 const debugPointRadius = 1
 
@@ -181,10 +187,11 @@ function startDiamond() {
               if (entity[component].isFlippedY) newComponent.flipY()
             }
             else {
-              // console.log('Updating component ' + component)
-              // console.log(entity[component])
-              // console.log(entities[name][component])
+              console.log('Updating component ' + component)
+              console.log(entity[component])
+              console.log(entities[name][component])
               entities[name][component].set(entity[component])
+              console.log('HI');
             }
           }
         }
@@ -325,6 +332,14 @@ function createDefaultComponent(entity, componentName) {
       }
       return new Diamond.CircleCollider(entity.rigidbody, defaultCircle)
       break
+    case 'polygonCollider':
+      if (!entity.rigidbody) {
+        if (!entity.transform)  return null
+        // HACK
+        // add rigidbody to the entity if it doesn't already exist
+        entity.rigidbody = new Diamond.Rigidbody2D(entity.transform)
+      }
+      return new Diamond.PolygonCollider(entity.rigidbody, defaultPolygon)
     default:
       return null
   }

@@ -1,4 +1,5 @@
 import React from 'react'
+import {Button} from './button'
 import {LabeledField} from './input'
 
 // prop onChange will be called when the value of a property input
@@ -40,6 +41,25 @@ export class ObjectPanel extends React.Component {
             />
           )
         })}
+      </div>
+    )
+  }
+}
+
+// prop addItem is a function that is called when the add button is clicked
+// to add an item to the array. The function should handle adding an array item.
+export class ArrayPanel extends React.Component {
+  render() {
+    return (
+      <div>
+        <ObjectPanel
+          label={this.props.label}
+          object={this.props.object}
+          onChange={this.props.onChange}
+        />
+        <div className="add-button-container">
+          <Button content={this.props.addButtonContent} onClick={this.props.addItem} />
+        </div>
       </div>
     )
   }

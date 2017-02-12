@@ -1,7 +1,7 @@
 import electron from 'electron'
 import React from 'react'
 import {Button} from './button'
-import {ObjectPanel} from './panel'
+import {ObjectPanel, ArrayPanel} from './panel'
 import {copyObj} from './util'
 
 // Diamond functions
@@ -20,6 +20,9 @@ export class ComponentPanel extends React.Component {
         break
       case 'particleEmitter':
         PanelComponentVar = ParticleComponentPanel
+        break
+      case 'polygonCollider':
+        PanelComponentVar = PointArrayComponentPanel
         break
       default:
         PanelComponentVar = ObjectPanel
@@ -151,6 +154,32 @@ class ParticleComponentPanel extends React.Component {
           onChange={this.handleChange}
         />
       </div>
+    )
+  }
+}
+
+class PointArrayComponentPanel extends React.Component {
+  constructor(props) {
+    super(props)
+    this.addItem = this.addItem.bind(this)
+  }
+
+  addItem() {
+    let array = this.props.object.slice(0)
+    array.push({})
+    copyObj(this.props.object[this.props.object.length - 1], array[this.props.object.length])
+    this.props.onChange(this.props.label, array)
+  }
+
+  render() {
+    return (
+      <ArrayPanel
+        label={this.props.label}
+        object={this.props.object}
+        onChange={this.props.onChange}
+        addButtonContent={'+'}
+        addItem={this.addItem}
+      />
     )
   }
 }

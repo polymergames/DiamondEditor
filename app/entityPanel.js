@@ -78,6 +78,7 @@ export class EntityPanel extends React.Component {
               items={[
                 'renderComponent',
                 'circleCollider',
+                'polygonCollider',
                 'particleEmitter'
               ]}
               onClick={this.createComponent}

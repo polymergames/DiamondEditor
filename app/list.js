@@ -99,8 +99,8 @@ export class DynamicSelectableList extends React.Component {
       items: this.props.items ? this.this.props.items : []
     }
 
-    this.addItem = this.addItem.bind(this);
-    this.onClick = this.onClick.bind(this);
+    this.addItem = this.addItem.bind(this)
+    this.onClick = this.onClick.bind(this)
   }
 
   addItem(item) {
