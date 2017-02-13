@@ -187,11 +187,10 @@ function startDiamond() {
               if (entity[component].isFlippedY) newComponent.flipY()
             }
             else {
-              console.log('Updating component ' + component)
-              console.log(entity[component])
-              console.log(entities[name][component])
+              // console.log('Updating component ' + component)
+              // console.log(entity[component])
+              // console.log(entities[name][component])
               entities[name][component].set(entity[component])
-              console.log('HI');
             }
           }
         }

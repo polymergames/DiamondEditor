@@ -21,6 +21,10 @@ export class Dropdown extends React.Component {
     window.addEventListener('mousedown', this.toggleMenu, false)
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('mousedown', this.toggleMenu, false)
+  }
+
   toggleMenu(e) {
     console.log('mousedown event')
     if (!this.mouseDownOnDropdown) {

@@ -1,10 +1,58 @@
 import React from 'react'
 
 export class LabeledField extends React.Component {
+  constructor(props) {
+    super(props)
+    this.startDrag = this.startDrag.bind(this)
+    this.onDrag = this.onDrag.bind(this)
+    this.stopDrag = this.stopDrag.bind(this)
+  }
+
+  componentDidMount() {
+    if (typeof this.props.value === 'number') {
+      window.addEventListener('mouseup', this.stopDrag, false)
+    }
+  }
+
+  componentWillUnmount() {
+    if (typeof this.props.value === 'number') {
+      window.removeEventListener('mouseup', this.stopDrag, false)
+    }
+  }
+
+  startDrag(e) {
+    if (typeof this.props.value === 'number') {
+      this.mouseX = e.clientX
+      window.addEventListener('mousemove', this.onDrag, false)
+      this.dragging = true
+    }
+  }
+
+  onDrag(e) {
+    this.props.onChange(this.props.value + (e.clientX - this.mouseX))
+    this.mouseX = e.clientX
+  }
+
+  stopDrag() {
+    if (typeof this.props.value === 'number') {
+      window.removeEventListener('mousemove', this.onDrag, false)
+      this.dragging = false
+    }
+  }
+
   render() {
+    let spanclass=""
+
+    if (typeof this.props.value === 'number')
+      spanclass = 'draggable-control'
+
     return (
       <label>
-        {this.props.label}
+        <span className={spanclass}
+          onMouseDown={this.startDrag}
+        >
+          {this.props.label}
+        </span>
         <TypedField
           value={this.props.value}
           onChange={this.props.onChange}
