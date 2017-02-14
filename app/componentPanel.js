@@ -18,9 +18,9 @@ export class ComponentPanel extends React.Component {
       case 'renderComponent':
         PanelComponentVar = RenderComponentPanel
         break
-      // case 'animatorSheet':
-      //   PanelComponentVar = AnimatorSheetComponentPanel
-      //   break
+      case 'animatorSheet':
+        PanelComponentVar = AnimatorSheetComponentPanel
+        break
       case 'particleEmitter':
         PanelComponentVar = ParticleComponentPanel
         break
@@ -129,9 +129,55 @@ class RenderComponentPanel extends React.Component {
   }
 }
 
-// class AnimatorSheetComponentPanel extends React.Component {
-//   //
-// }
+class AnimatorSheetComponentPanel extends React.Component {
+  constructor(props) {
+    super(props)
+    this.handleSpriteChange = this.handleSpriteChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  handleSpriteChange(spriteHandle) {
+    // pass on the new spritesheet to the parent
+    let obj = {}
+    copyObj(this.props.object, obj)
+    obj.spritesheet = {handle: spriteHandle}
+    this.props.onChange(this.props.label, obj)
+  }
+
+  handleChange(componentName, displayedObj) {
+    // the spritesheet object was removed from the displayed object,
+    // so it should be added back before sending to the parent
+    let obj = {}
+    copyObj(displayedObj, obj)
+    obj.spritesheet = this.props.object.spritesheet
+    this.props.onChange(componentName, obj)
+  }
+
+  render() {
+    // don't display the spritesheet handle- the path will be displayed instead
+    let displayedObj = {}
+    copyObj(this.props.object, displayedObj)
+    delete displayedObj.spritesheet
+
+    return (
+      <div>
+        <h3>{this.props.label}</h3>
+        <p>{'spritesheet: '}
+          <SpriteField
+            spriteHandle={this.props.object.spritesheet.handle}
+            onChange={this.handleSpriteChange}
+          />
+        </p>
+        <ObjectPanel
+          label={this.props.label}
+          hideLabel={true}
+          object={displayedObj}
+          onChange={this.handleChange}
+        />
+      </div>
+    )
+  }
+}
 
 class ParticleComponentPanel extends React.Component {
   constructor(props) {

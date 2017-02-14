@@ -102,6 +102,7 @@ function startDiamond() {
     // the properties being modified, any properties that are not included will
     // not be deleted or changed.
     global.updateEntity = function(name, entity) {
+      console.log(entity)
       updateEntityQueue.push({name: name, entity: entity})
     }
 
@@ -177,6 +178,14 @@ function startDiamond() {
         let entity = updateEntityQueue[i].entity
         if (entities.hasOwnProperty(name)) {
           for (let component in entity) {
+            // safety check- animation values are not allowed to be < 1
+            if (component == 'animatorSheet') {
+              Object.keys(entity[component]).map(prop => {
+                if (typeof entity[component][prop] === 'number' && entity[component][prop] < 1) {
+                  entity[component][prop] = 1
+                }
+              })
+            }
             // TODO: this is a temporary fix for renderComponent
             // when renderComponent sprite is changed with .set,
             // it gets messed up :()
