@@ -180,26 +180,27 @@ function startDiamond() {
             // TODO: this is a temporary fix for renderComponent
             // when renderComponent sprite is changed with .set,
             // it gets messed up :()
-            // if (component == 'renderComponent' &&
-            //     entities[name].transform &&
-            //     entity[component].sprite) {
-            //   entities[name][component].destroy()
-            //   entities[name][component] = new Diamond.RenderComponent2D(
-            //       entities[name].transform,
-            //       entity[component].sprite
-            //   )
-            //   let newComponent = entities[name][component]
-            //   newComponent.layer = entity[component].layer
-            //   newComponent.pivot = entity[component].pivot
-            //   if (entity[component].isFlippedX) newComponent.flipX()
-            //   if (entity[component].isFlippedY) newComponent.flipY()
-            // }
-            // else {
+            if (component == 'renderComponent' &&
+                !entities[name].animatorSheet && // because render component shouldnt be destroyed while being used by an animator
+                entities[name].transform &&
+                entity[component].sprite) {
+              entities[name][component].destroy()
+              entities[name][component] = new Diamond.RenderComponent2D(
+                  entities[name].transform,
+                  entity[component].sprite
+              )
+              let newComponent = entities[name][component]
+              newComponent.layer = entity[component].layer
+              newComponent.pivot = entity[component].pivot
+              if (entity[component].isFlippedX) newComponent.flipX()
+              if (entity[component].isFlippedY) newComponent.flipY()
+            }
+            else {
               // console.log('Updating component ' + component)
               // console.log(entity[component])
               // console.log(entities[name][component])
               entities[name][component].set(entity[component])
-            // }
+            }
           }
         }
       }

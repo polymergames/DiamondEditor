@@ -18,6 +18,9 @@ export class ComponentPanel extends React.Component {
       case 'renderComponent':
         PanelComponentVar = RenderComponentPanel
         break
+      // case 'animatorSheet':
+      //   PanelComponentVar = AnimatorSheetComponentPanel
+      //   break
       case 'particleEmitter':
         PanelComponentVar = ParticleComponentPanel
         break
@@ -43,11 +46,14 @@ export class ComponentPanel extends React.Component {
   }
 }
 
-class RenderComponentPanel extends React.Component {
+// prop spriteHandle should be the integer handle
+// of the Diamond texture to be converted to a file link.
+// prop onChange will be called with the new texture handle
+// when the sprite in this field is changed.
+class SpriteField extends React.Component {
   constructor(props) {
     super(props)
     this.openSprite = this.openSprite.bind(this)
-    this.handleChange = this.handleChange.bind(this)
   }
 
   // load a sprite from a file provided by the file picker
@@ -56,15 +62,34 @@ class RenderComponentPanel extends React.Component {
       if (fileNames.length > 0) {
         let sprite = getTextureFromPath(fileNames[0])
         if (sprite) {
-          let renderObj = this.props.object
-          renderObj.sprite = sprite
-          this.props.onChange(this.props.label, renderObj)
+          this.props.onChange(sprite.handle)
         }
         else {
           console.log('Sprite ' + fileName + ' could not be loaded!');
         }
       }
     })
+  }
+
+  render() {
+    let spritePath = getTexturePathFromHandle(this.props.spriteHandle)
+    return (<span className="file-link" onClick={this.openSprite}>{spritePath}</span>)
+  }
+}
+
+class RenderComponentPanel extends React.Component {
+  constructor(props) {
+    super(props)
+    this.handleSpriteChange = this.handleSpriteChange.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  handleSpriteChange(spriteHandle) {
+    // pass on the new sprite to the parent
+    let renderObj = {}
+    copyObj(this.props.object, renderObj)
+    renderObj.sprite = {handle: spriteHandle}
+    this.props.onChange(this.props.label, renderObj)
   }
 
   handleChange(componentName, displayedObj) {
@@ -77,11 +102,6 @@ class RenderComponentPanel extends React.Component {
   }
 
   render() {
-    let spritePath = null
-    if (this.props.object.sprite) {
-      spritePath = getTexturePathFromHandle(this.props.object.sprite.handle)
-    }
-
     // don't display the sprite handle- the path will be displayed instead
     let displayedObj = {}
     copyObj(this.props.object, displayedObj)
@@ -90,7 +110,14 @@ class RenderComponentPanel extends React.Component {
     return (
       <div>
         <h3>{this.props.label}</h3>
-        <p>sprite: <span className="fileLink" onClick={this.openSprite}>{spritePath}</span></p>
+        {this.props.object.sprite && (
+          <p>{'sprite: '}
+            <SpriteField
+              spriteHandle={this.props.object.sprite.handle}
+              onChange={this.handleSpriteChange}
+            />
+          </p>
+        )}
         <ObjectPanel
           label={this.props.label}
           hideLabel={true}
@@ -102,28 +129,24 @@ class RenderComponentPanel extends React.Component {
   }
 }
 
+// class AnimatorSheetComponentPanel extends React.Component {
+//   //
+// }
+
 class ParticleComponentPanel extends React.Component {
   constructor(props) {
     super(props)
-    this.openSprite = this.openSprite.bind(this)
+    this.handleSpriteChange = this.handleSpriteChange.bind(this)
     this.handleChange = this.handleChange.bind(this)
   }
 
   // load a sprite from a file provided by the file picker
-  openSprite() {
-    openFilePicker(fileNames => {
-      if (fileNames.length > 0) {
-        let sprite = getTextureFromPath(fileNames[0])
-        if (sprite) {
-          let particleObj = this.props.object
-          particleObj.particleTexture = fileNames[0]
-          this.props.onChange(this.props.label, particleObj)
-        }
-        else {
-          console.log('Sprite ' + fileName + ' could not be loaded!');
-        }
-      }
-    })
+  handleSpriteChange(spriteHandle) {
+    // pass on the new sprite to the parent
+    let particleObj = {}
+    copyObj(this.props.object, particleObj)
+    particleObj.particleTexture = getTexturePathFromHandle(spriteHandle)
+    this.props.onChange(this.props.label, particleObj)
   }
 
   handleChange(componentName, displayedObj) {
@@ -136,9 +159,9 @@ class ParticleComponentPanel extends React.Component {
   }
 
   render() {
-    let spritePath = this.props.object.particleTexture
+    let sprite = getTextureFromPath(this.props.object.particleTexture)
 
-    // remove the default display of the sprite path
+    // remove the default display of the sprite path (will be replaced by link)
     let displayedObj = {}
     copyObj(this.props.object, displayedObj)
     delete displayedObj.particleTexture
@@ -146,7 +169,14 @@ class ParticleComponentPanel extends React.Component {
     return (
       <div>
         <h3>{this.props.label}</h3>
-        <p>particleTexture: <span className="fileLink" onClick={this.openSprite}>{spritePath}</span></p>
+        {sprite && (
+          <p>{'particleTexture: '}
+            <SpriteField
+              spriteHandle={sprite.handle}
+              onChange={this.handleSpriteChange}
+            />
+          </p>
+        )}
         <ObjectPanel
           label={this.props.label}
           hideLabel={true}

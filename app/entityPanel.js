@@ -59,6 +59,11 @@ export class EntityPanel extends React.Component {
   }
 
   render() {
+    // remove sprite from render component if an animator is present
+    if (this.state.entity.animatorSheet && this.state.entity.renderComponent) {
+      delete this.state.entity.renderComponent.sprite
+    }
+
     return (
       <div>
         <h3>{this.state.name}</h3>
