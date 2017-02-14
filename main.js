@@ -22,6 +22,14 @@ let textureTable = {}
 const defaultTexturePath = 'assets/default.png'
 const defaultParticleConfigPath = 'assets/defaultParticles.json'
 
+const defaultSpritesheetPath = 'assets/defaultSpritesheet.png'
+let defaultAnimation = {
+  frameLength: 20,
+  numFrames:   4,
+  numRows:     1,
+  numColumns:  4
+}
+
 const defaultCircle = {center: {x: 0, y: 0}, radius: 50}
 const defaultPolygon = [
   {x: -15, y: -15},
@@ -172,26 +180,26 @@ function startDiamond() {
             // TODO: this is a temporary fix for renderComponent
             // when renderComponent sprite is changed with .set,
             // it gets messed up :()
-            if (component == 'renderComponent' &&
-                entities[name].transform &&
-                entity[component].sprite) {
-              entities[name][component].destroy()
-              entities[name][component] = new Diamond.RenderComponent2D(
-                  entities[name].transform,
-                  entity[component].sprite
-              )
-              let newComponent = entities[name][component]
-              newComponent.layer = entity[component].layer
-              newComponent.pivot = entity[component].pivot
-              if (entity[component].isFlippedX) newComponent.flipX()
-              if (entity[component].isFlippedY) newComponent.flipY()
-            }
-            else {
+            // if (component == 'renderComponent' &&
+            //     entities[name].transform &&
+            //     entity[component].sprite) {
+            //   entities[name][component].destroy()
+            //   entities[name][component] = new Diamond.RenderComponent2D(
+            //       entities[name].transform,
+            //       entity[component].sprite
+            //   )
+            //   let newComponent = entities[name][component]
+            //   newComponent.layer = entity[component].layer
+            //   newComponent.pivot = entity[component].pivot
+            //   if (entity[component].isFlippedX) newComponent.flipX()
+            //   if (entity[component].isFlippedY) newComponent.flipY()
+            // }
+            // else {
               // console.log('Updating component ' + component)
               // console.log(entity[component])
               // console.log(entities[name][component])
               entities[name][component].set(entity[component])
-            }
+            // }
           }
         }
       }
@@ -305,12 +313,28 @@ function createDefaultComponent(entity, componentName) {
         Diamond.Vector2.scalarVec(Diamond.renderer.resolution, {x: 0.5, y: 0.5})
       return new Diamond.Transform2(screenMiddle)
       break
+
     case 'renderComponent':
       if (!entity.transform)  return null
-      defaultTexture = getTextureFromPath(defaultTexturePath)
+      let defaultTexture = getTextureFromPath(defaultTexturePath)
       if (!defaultTexture)    return null
       return new Diamond.RenderComponent2D(entity.transform, defaultTexture)
       break
+
+    case 'animatorSheet':
+      if (!entity.renderComponent) {
+        // HACK
+        // add renderComponent to entity if it doesn't already exist
+        entity.renderComponent = createDefaultComponent(entity, 'renderComponent')
+        if (!entity.renderComponent) {
+          console.log('Failed to load render component')
+          return null
+        }
+      }
+      defaultAnimation.spritesheet = getTextureFromPath(defaultSpritesheetPath)
+      entity.renderComponent.sprite = defaultAnimation.spritesheet
+      return new Diamond.AnimatorSheet(defaultAnimation, entity.renderComponent)
+
     case 'particleEmitter':
       if (!entity.transform)  return null
       const configFile = fs.readFileSync(defaultParticleConfigPath)
@@ -322,6 +346,7 @@ function createDefaultComponent(entity, componentName) {
         return null
       }
       break
+
     case 'circleCollider':
       if (!entity.rigidbody) {
         if (!entity.transform)  return null
@@ -331,6 +356,7 @@ function createDefaultComponent(entity, componentName) {
       }
       return new Diamond.CircleCollider(entity.rigidbody, defaultCircle)
       break
+
     case 'polygonCollider':
       if (!entity.rigidbody) {
         if (!entity.transform)  return null

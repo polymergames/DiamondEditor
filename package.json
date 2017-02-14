@@ -30,7 +30,7 @@
   "homepage": "polymergames.com",
   "electronVersion": "1.4.13",
   "dependencies": {
-    "jdiamond": "^0.4",
+    "jdiamond": "^0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2"
   },
