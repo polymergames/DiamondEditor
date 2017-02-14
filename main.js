@@ -102,7 +102,7 @@ function startDiamond() {
     // the properties being modified, any properties that are not included will
     // not be deleted or changed.
     global.updateEntity = function(name, entity) {
-      console.log(entity)
+      // console.log(entity)
       updateEntityQueue.push({name: name, entity: entity})
     }
 
@@ -216,7 +216,33 @@ function startDiamond() {
       updateEntityQueue = []
 
       // Destroy removed components
-      // TODO
+      for (let i = 0; i < deleteComponentQueue.length; ++i) {
+        console.log('Gonna destroy the thing!')
+        let entityName = deleteComponentQueue[i].entityName
+        let componentName = deleteComponentQueue[i].componentName
+
+        // check that the entity exists and that
+        // it has the component being removed.
+        if (entities.hasOwnProperty(entityName) &&
+            entities[entityName].hasOwnProperty(componentName)) {
+          // don't remove a component if a dependent component exists
+          if (!(componentName == 'renderComponent' &&
+                entities[entityName].hasOwnProperty('animatorSheet')) &&
+              !(componentName == 'rigidbody' &&
+                (entities[entityName].hasOwnProperty('circleCollider') ||
+                 entities[entityName].hasOwnProperty('polygonCollider'))
+               )
+             ) {
+            entities[entityName][componentName].destroy()
+            delete entities[entityName][componentName]
+
+            // update the displayed entity in the UI if necessary
+            displayedEntityNeedsUpdate = displayedEntityNeedsUpdate ||
+                                         entityName == currentlyDisplayedEntityName
+          }
+        }
+      }
+      deleteComponentQueue = []
 
       // Destroy deleted entities
       for (let i = 0; i < deleteEntityQueue.length; ++i) {

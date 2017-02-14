@@ -7,6 +7,7 @@ import {Menu} from './menu'
 // Diamond functions
 const diamondUpdateEntity = electron.remote.getGlobal('updateEntity')
 const diamondCreateComponent = electron.remote.getGlobal('createEntityComponent')
+const diamondRemoveComponent = electron.remote.getGlobal('removeEntityComponent')
 const entityChannel = 'setEntity'
 
 export class EntityPanel extends React.Component {
@@ -20,6 +21,7 @@ export class EntityPanel extends React.Component {
 
     this.setEntity = this.setEntity.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.removeComponent = this.removeComponent.bind(this)
     this.createComponent = this.createComponent.bind(this)
   }
 
@@ -54,6 +56,10 @@ export class EntityPanel extends React.Component {
     })
   }
 
+  removeComponent(componentName) {
+    diamondRemoveComponent(this.state.name, componentName)
+  }
+
   createComponent(componentName) {
     diamondCreateComponent(this.state.name, componentName)
   }
@@ -74,6 +80,7 @@ export class EntityPanel extends React.Component {
               label={componentName}
               object={this.state.entity[componentName]}
               onChange={this.handleChange}
+              onClose={this.removeComponent}
             />
           )
         })}

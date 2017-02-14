@@ -34,6 +34,14 @@ export class ComponentPanel extends React.Component {
     if (PanelComponentVar) {
       return (
         <div className="component-panel">
+          <div className="close-button-container">
+            {this.props.label != 'transform' && (
+              <Button
+                content="x"
+                onClick={e => this.props.onClose(this.props.label)}
+              />
+            )}
+          </div>
           <PanelComponentVar
             label={this.props.label}
             object={this.props.object}
