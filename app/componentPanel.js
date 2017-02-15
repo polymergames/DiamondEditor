@@ -2,12 +2,13 @@ import electron from 'electron'
 import React from 'react'
 import {Button} from './button'
 import {ObjectPanel, ArrayPanel} from './panel'
-import {copyObj} from './util'
+import * as Util from './util'
 
 // Diamond functions
 const getTextureFromPath = electron.remote.getGlobal('getTextureFromPath')
 const getTexturePathFromHandle = electron.remote.getGlobal('getTexturePathFromHandle')
 const openFilePicker = electron.remote.getGlobal('openFilePicker')
+const saveKeyVals = electron.remote.getGlobal('saveKeyVals')
 
 // renders the appropriate UI panel for editing the given Diamond component
 export class ComponentPanel extends React.Component {
@@ -21,11 +22,14 @@ export class ComponentPanel extends React.Component {
       case 'animatorSheet':
         PanelComponentVar = AnimatorSheetComponentPanel
         break
-      case 'particleEmitter':
-        PanelComponentVar = ParticleComponentPanel
+      case 'circleCollider':
+        PanelComponentVar = CircleColliderComponentPanel
         break
       case 'polygonCollider':
         PanelComponentVar = PointArrayComponentPanel
+        break
+      case 'particleEmitter':
+        PanelComponentVar = ParticleComponentPanel
         break
       default:
         PanelComponentVar = ObjectPanel
@@ -47,6 +51,19 @@ export class ComponentPanel extends React.Component {
             object={this.props.object}
             onChange={this.props.onChange}
           />
+          <div className="save-button-container">
+            {this.props.label != 'rigidbody' && (
+              <Button
+                content="save"
+                onClick={e => {
+                  let config = {}
+                  Util.componentObjToConfig(this.props.label, this.props.object, config)
+                  // send config to main process to save in a file
+                  saveKeyVals(config)
+                }}
+              />
+            )}
+          </div>
         </div>
       )
     }
@@ -95,7 +112,7 @@ class RenderComponentPanel extends React.Component {
   handleSpriteChange(spriteHandle) {
     // pass on the new sprite to the parent
     let renderObj = {}
-    copyObj(this.props.object, renderObj)
+    Util.copyObj(this.props.object, renderObj)
     renderObj.sprite = {handle: spriteHandle}
     this.props.onChange(this.props.label, renderObj)
   }
@@ -104,7 +121,7 @@ class RenderComponentPanel extends React.Component {
     // the sprite object was removed from the displayed object,
     // so it should be added back before sending to the parent
     let renderObj = {}
-    copyObj(displayedObj, renderObj)
+    Util.copyObj(displayedObj, renderObj)
     renderObj.sprite = this.props.object.sprite
     this.props.onChange(componentName, renderObj)
   }
@@ -112,7 +129,7 @@ class RenderComponentPanel extends React.Component {
   render() {
     // don't display the sprite handle- the path will be displayed instead
     let displayedObj = {}
-    copyObj(this.props.object, displayedObj)
+    Util.copyObj(this.props.object, displayedObj)
     delete displayedObj.sprite
 
     return (
@@ -147,7 +164,7 @@ class AnimatorSheetComponentPanel extends React.Component {
   handleSpriteChange(spriteHandle) {
     // pass on the new spritesheet to the parent
     let obj = {}
-    copyObj(this.props.object, obj)
+    Util.copyObj(this.props.object, obj)
     obj.spritesheet = {handle: spriteHandle}
     this.props.onChange(this.props.label, obj)
   }
@@ -156,7 +173,7 @@ class AnimatorSheetComponentPanel extends React.Component {
     // the spritesheet object was removed from the displayed object,
     // so it should be added back before sending to the parent
     let obj = {}
-    copyObj(displayedObj, obj)
+    Util.copyObj(displayedObj, obj)
     obj.spritesheet = this.props.object.spritesheet
     this.props.onChange(componentName, obj)
   }
@@ -164,7 +181,7 @@ class AnimatorSheetComponentPanel extends React.Component {
   render() {
     // don't display the spritesheet handle- the path will be displayed instead
     let displayedObj = {}
-    copyObj(this.props.object, displayedObj)
+    Util.copyObj(this.props.object, displayedObj)
     delete displayedObj.spritesheet
 
     return (
@@ -198,7 +215,7 @@ class ParticleComponentPanel extends React.Component {
   handleSpriteChange(spriteHandle) {
     // pass on the new sprite to the parent
     let particleObj = {}
-    copyObj(this.props.object, particleObj)
+    Util.copyObj(this.props.object, particleObj)
     particleObj.particleTexture = getTexturePathFromHandle(spriteHandle)
     this.props.onChange(this.props.label, particleObj)
   }
@@ -207,7 +224,7 @@ class ParticleComponentPanel extends React.Component {
     // the particleTexture value was removed from the displayed object,
     // so it should be added back before sending to the parent
     let particleObj = {}
-    copyObj(displayedObj, particleObj)
+    Util.copyObj(displayedObj, particleObj)
     particleObj.particleTexture = this.props.object.particleTexture
     this.props.onChange(componentName, particleObj)
   }
@@ -217,7 +234,7 @@ class ParticleComponentPanel extends React.Component {
 
     // remove the default display of the sprite path (will be replaced by link)
     let displayedObj = {}
-    copyObj(this.props.object, displayedObj)
+    Util.copyObj(this.props.object, displayedObj)
     delete displayedObj.particleTexture
 
     return (
@@ -242,6 +259,18 @@ class ParticleComponentPanel extends React.Component {
   }
 }
 
+class CircleColliderComponentPanel extends React.Component {
+  render() {
+    return (
+      <ObjectPanel
+        label={this.props.label}
+        object={this.props.object}
+        onChange={this.props.onChange}
+      />
+    )
+  }
+}
+
 class PointArrayComponentPanel extends React.Component {
   constructor(props) {
     super(props)
@@ -251,7 +280,7 @@ class PointArrayComponentPanel extends React.Component {
   addItem() {
     let array = this.props.object.slice(0)
     array.push({})
-    copyObj(this.props.object[this.props.object.length - 1], array[this.props.object.length])
+    Util.copyObj(this.props.object[this.props.object.length - 1], array[this.props.object.length])
     this.props.onChange(this.props.label, array)
   }
 

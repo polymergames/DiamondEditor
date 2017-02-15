@@ -130,6 +130,7 @@ function startDiamond() {
     global.getTexturePathFromHandle = getTexturePathFromHandle
 
     global.openFilePicker = openFilePicker
+    global.saveKeyVals = saveKeyVals
 
     // receive messages from component panel window
     ipcMain.on(entityChannel, function(event, message) {
@@ -217,7 +218,6 @@ function startDiamond() {
 
       // Destroy removed components
       for (let i = 0; i < deleteComponentQueue.length; ++i) {
-        console.log('Gonna destroy the thing!')
         let entityName = deleteComponentQueue[i].entityName
         let componentName = deleteComponentQueue[i].componentName
 
@@ -413,6 +413,19 @@ function openFilePicker(callback) {
   dialog.showOpenDialog({
     properties: ['openFile']
   }, callback)
+}
+
+// saves the given object to a file as a list of key-value pairs.
+function saveKeyVals(obj) {
+  dialog.showSaveDialog({}, fileName => {
+    if (fileName) {
+      let configStr = Diamond.Util.objToKeyvalPairs(obj)
+      fs.writeFile(fileName, configStr, error => {
+        if (error)
+          console.log(error)
+      })
+    }
+  })
 }
 
 function createEntityListPanel() {
