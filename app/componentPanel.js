@@ -9,6 +9,7 @@ const getTextureFromPath = electron.remote.getGlobal('getTextureFromPath')
 const getTexturePathFromHandle = electron.remote.getGlobal('getTexturePathFromHandle')
 const openFilePicker = electron.remote.getGlobal('openFilePicker')
 const saveKeyVals = electron.remote.getGlobal('saveKeyVals')
+// const entityChannel = 'setEntity'
 
 // renders the appropriate UI panel for editing the given Diamond component
 export class ComponentPanel extends React.Component {
@@ -52,17 +53,24 @@ export class ComponentPanel extends React.Component {
             onChange={this.props.onChange}
           />
           <div className="save-button-container">
-            {this.props.label != 'rigidbody' && (
-              <Button
-                content="save"
-                onClick={e => {
-                  let config = {}
-                  Util.componentObjToConfig(this.props.label, this.props.object, config)
-                  // send config to main process to save in a file
-                  saveKeyVals(config)
-                }}
-              />
-            )}
+            {this.props.label != 'rigidbody' &&
+              // TODO: opening the save dialog breaks the renderer for some reason
+              (
+                <Button
+                  content="save"
+                  onClick={e => {
+                    let config = {}
+                    Util.componentObjToConfig(this.props.label, this.props.object, config)
+                    // send config to main process to save in a file
+                    saveKeyVals(config)
+                    // ipcRenderer.send(entityChannel, config)
+                  }}
+                />
+              )
+            // See
+            // http://stackoverflow.com/questions/11336663/how-to-make-a-browser-display-a-save-as-dialog-so-the-user-can-save-the-conten
+            // <a href="data:application/xml;charset=utf-8,swag" download="component.cfg">save</a>
+            }
           </div>
         </div>
       )

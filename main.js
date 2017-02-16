@@ -134,8 +134,9 @@ function startDiamond() {
 
     // receive messages from component panel window
     ipcMain.on(entityChannel, function(event, message) {
-      if (message == 'needEntity')
+      if (message === 'needEntity') {
         updateDisplayedEntity(currentlyDisplayedEntityName)
+      }
     })
 
 
@@ -274,14 +275,6 @@ function startDiamond() {
           if (entity.polygonCollider) {
             Diamond.Debug.drawPolyCollider(entity.polygonCollider, debugColor)
           }
-          // draw circle component
-          // if (entity.circle) {
-          //   Diamond.Debug.drawCircle(entity.circle, debugColor)
-          // }
-          // draw polygon component
-          // if (entity.polygon) {
-          //   Diamond.Debug.drawPoly(entity.polygon.points, debugColor)
-          // }
         }
         // console.log(entityName)
         // console.log(entity.transform.obj)
