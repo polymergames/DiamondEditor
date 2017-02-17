@@ -47,13 +47,18 @@ function startUp() {
   installExtension.default(installExtension.REACT_DEVELOPER_TOOLS)
     .then((name) => {
       console.log(`Added Extension:  ${name}`)
-      startDiamond()
     })
     .catch((err) => console.log('An error occurred: ', err))
+
+  // launch!
+  startDiamond()
 }
 
 function startDiamond() {
-  if (Diamond.init()) {
+  let config = new Diamond.Config()
+  // TODO: let user configure window size, etc.
+
+  if (Diamond.init(config)) {
     isDiamondOpen = true
 
     // set of entity objects. an entity object contains component objects.

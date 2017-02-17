@@ -1,6 +1,7 @@
 
 *.DS_Store
 public/js/*.bundle.js
+bin
 
 # Created by https://www.gitignore.io/api/node
 
