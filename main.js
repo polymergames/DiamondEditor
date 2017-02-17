@@ -19,10 +19,10 @@ let isDiamondOpen = false
 
 let textureTable = {}
 
-const defaultTexturePath = 'assets/default.png'
-const defaultParticleConfigPath = 'assets/defaultParticles.json'
+const defaultTexturePath = path.join(__dirname, 'assets/default.png')
+const defaultParticleConfigPath = path.join(__dirname, 'assets/defaultParticles.json')
 
-const defaultSpritesheetPath = 'assets/defaultSpritesheet.png'
+const defaultSpritesheetPath = path.join(__dirname, 'assets/defaultSpritesheet.png')
 let defaultAnimation = {
   frameLength: 20,
   numFrames:   4,
@@ -405,8 +405,11 @@ function createDefaultComponent(entity, componentName) {
     case 'particleEmitter':
       if (!entity.transform)  return null
       const configFile = fs.readFileSync(defaultParticleConfigPath)
+      let config = JSON.parse(configFile)
+      // need to make particleTexture path relative to electron directory
+      config.particleTexture = path.join(__dirname, config.particleTexture)
       if (configFile) {
-        return new Diamond.ParticleEmitter2D(JSON.parse(configFile), entity.transform)
+        return new Diamond.ParticleEmitter2D(config, entity.transform)
       }
       else {
         console.log('Failed to load particle config ' + defaultParticleConfigPath);
