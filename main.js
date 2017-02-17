@@ -44,9 +44,6 @@ function startUp() {
   // DEBUG
   // TODO: remove this from release
   // add react developer tools
-  // BrowserWindow.addDevToolsExtension(
-  //   '~/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
-  // )
   installExtension.default(installExtension.REACT_DEVELOPER_TOOLS)
     .then((name) => {
       console.log(`Added Extension:  ${name}`)
@@ -130,6 +127,7 @@ function startDiamond() {
     global.getTexturePathFromHandle = getTexturePathFromHandle
 
     global.openFilePicker = openFilePicker
+    global.parseConfigFile = parseConfigFile
     global.saveKeyVals = saveKeyVals
 
     // receive messages from component panel window
@@ -321,6 +319,46 @@ function getTexturePathFromHandle(textureHandle) {
   return null
 }
 
+// opens the system dialog to open file(s).
+// passes the selected files(s) as an array of file paths to callback.
+function openFilePicker(callback) {
+  dialog.showOpenDialog({
+    properties: ['openFile']
+  }, callback)
+}
+
+function parseConfigFile(fileName, config) {
+  // TODO: is it safe to assume utf8 encoding?
+  // is there a more robust way?
+  let configStr = fs.readFileSync(fileName, 'utf8')
+  if (configStr) {
+    configStr.split(/\r?\n/).map(str => {
+      let line = str.trim()
+      // a line of config must have at least key:value
+      // and should not start with '#' (comment line)
+      if (line.length >= 3 && line.charAt(0) != '#') {
+        let parts = line.split(/:/)
+        if (parts.length > 1)
+          config[parts[0].trim()] = parts[1].trim()
+      }
+    })
+  }
+  return config
+}
+
+// saves the given object to a file as a list of key-value pairs.
+function saveKeyVals(obj) {
+  dialog.showSaveDialog({}, fileName => {
+    if (fileName) {
+      let configStr = Diamond.Util.objToKeyvalPairs(obj)
+      fs.writeFile(fileName, configStr, error => {
+        if (error)
+          console.log(error)
+      })
+    }
+  })
+}
+
 // returns an object containing all the component.obj objects
 // of the components in the given entity
 function entityObj(entity) {
@@ -399,27 +437,6 @@ function createDefaultComponent(entity, componentName) {
   }
 }
 
-
-// opens the system dialog to open file(s).
-// passes the selected files(s) as an array of file paths to callback.
-function openFilePicker(callback) {
-  dialog.showOpenDialog({
-    properties: ['openFile']
-  }, callback)
-}
-
-// saves the given object to a file as a list of key-value pairs.
-function saveKeyVals(obj) {
-  dialog.showSaveDialog({}, fileName => {
-    if (fileName) {
-      let configStr = Diamond.Util.objToKeyvalPairs(obj)
-      fs.writeFile(fileName, configStr, error => {
-        if (error)
-          console.log(error)
-      })
-    }
-  })
-}
 
 function createEntityListPanel() {
   entitylistPanel = new BrowserWindow({

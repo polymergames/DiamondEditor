@@ -8,8 +8,8 @@ import * as Util from './util'
 const getTextureFromPath = electron.remote.getGlobal('getTextureFromPath')
 const getTexturePathFromHandle = electron.remote.getGlobal('getTexturePathFromHandle')
 const openFilePicker = electron.remote.getGlobal('openFilePicker')
+const parseConfigFile = electron.remote.getGlobal('parseConfigFile')
 const saveKeyVals = electron.remote.getGlobal('saveKeyVals')
-// const entityChannel = 'setEntity'
 
 // renders the appropriate UI panel for editing the given Diamond component
 export class ComponentPanel extends React.Component {
@@ -52,9 +52,29 @@ export class ComponentPanel extends React.Component {
             object={this.props.object}
             onChange={this.props.onChange}
           />
+          <div className="open-button-container">
+            {this.props.label != 'rigidbody' &&
+              (
+                <Button
+                  content="open"
+                  onClick={e => {
+                    openFilePicker(fileNames => {
+                      // get this component's config from the opened file
+                      if (fileNames && fileNames.length > 0) {
+                        let obj = Object.assign({}, this.props.object)
+                        let config = parseConfigFile(fileNames[0], {})
+                        obj = Util.configToComponentObj(this.props.label, config, obj)
+                        this.props.onChange(this.props.label, obj)
+                      }
+                    })
+                  }}
+                />
+              )
+            }
+          </div>
           <div className="save-button-container">
             {this.props.label != 'rigidbody' &&
-              // TODO: opening the save dialog breaks the renderer for some reason
+              // BUG: opening the save dialog breaks the renderer for some reason
               (
                 <Button
                   content="save"
@@ -63,7 +83,6 @@ export class ComponentPanel extends React.Component {
                     Util.componentObjToConfig(this.props.label, this.props.object, config)
                     // send config to main process to save in a file
                     saveKeyVals(config)
-                    // ipcRenderer.send(entityChannel, config)
                   }}
                 />
               )
@@ -92,7 +111,7 @@ class SpriteField extends React.Component {
   // load a sprite from a file provided by the file picker
   openSprite() {
     openFilePicker(fileNames => {
-      if (fileNames.length > 0) {
+      if (fileNames && fileNames.length > 0) {
         let sprite = getTextureFromPath(fileNames[0])
         if (sprite) {
           this.props.onChange(sprite.handle)
