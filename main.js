@@ -184,7 +184,7 @@ function startDiamond() {
         if (entities.hasOwnProperty(name)) {
           for (let component in entity) {
             // safety check- animation values are not allowed to be < 1
-            if (component == 'animatorSheet') {
+            if (component === 'animatorSheet') {
               Object.keys(entity[component]).map(prop => {
                 if (typeof entity[component][prop] === 'number' && entity[component][prop] < 1) {
                   entity[component][prop] = 1
@@ -194,7 +194,7 @@ function startDiamond() {
             // TODO: this is a temporary fix for renderComponent
             // when renderComponent sprite is changed with .set,
             // it gets messed up :()
-            if (component == 'renderComponent' &&
+            if (component === 'renderComponent' &&
                 !entities[name].animatorSheet && // because render component shouldnt be destroyed while being used by an animator
                 entities[name].transform &&
                 entity[component].sprite) {
@@ -208,6 +208,12 @@ function startDiamond() {
               newComponent.pivot = entity[component].pivot
               if (entity[component].isFlippedX) newComponent.flipX()
               if (entity[component].isFlippedY) newComponent.flipY()
+            }
+            // safety check- polygon colliders should have at least 3 points
+            // if less than 3 points were given, UI needs to be updated to be fixed
+            else if (component === 'polygonCollider' && entity[component].length < 3) {
+              displayedEntityNeedsUpdate = displayedEntityNeedsUpdate ||
+                                           entityName == currentlyDisplayedEntityName
             }
             else {
               // console.log('Updating component ' + component)
