@@ -44,11 +44,11 @@ function startUp() {
   // DEBUG
   // TODO: remove this from release
   // add react developer tools
-  installExtension.default(installExtension.REACT_DEVELOPER_TOOLS)
-    .then((name) => {
-      console.log(`Added Extension:  ${name}`)
-    })
-    .catch((err) => console.log('An error occurred: ', err))
+  // installExtension.default(installExtension.REACT_DEVELOPER_TOOLS)
+  //   .then((name) => {
+  //     console.log(`Added Extension:  ${name}`)
+  //   })
+  //   .catch((err) => console.log('An error occurred: ', err))
 
   // launch!
   startDiamond()
@@ -304,9 +304,14 @@ function startDiamond() {
     createEntityListPanel()
 
     // Fire up the engine
-    Diamond.launch(update)
-    Diamond.cleanUp()
-    isDiamondOpen = false
+    Diamond.launch({
+        update: update,
+        postQuit: () => {
+            Diamond.cleanUp()
+            isDiamondOpen = false
+        },
+        launchAsync: true
+    })
   }
 }
 
