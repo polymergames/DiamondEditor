@@ -29,5 +29,10 @@
     "maxParticleAccelerationY": 0,
     "minParticleAngularSpeed": 0,
     "maxParticleAngularSpeed": 0,
+    "animateAlpha": 0,
+    "minBirthAlpha": 255,
+    "maxBirthAlpha": 255,
+    "minDeathAlpha": 255,
+    "maxDeathAlpha": 255,
     "emitOnWake": 0
 }

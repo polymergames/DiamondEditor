@@ -172,6 +172,7 @@ export function pointsConfigToArray(config) {
 
 export function particleEmitterObjToConfig(particles, config) {
   Object.assign(config, particles)
+  // extract the file name from the full path
   config.particleTexture = config.particleTexture.split(/\/|\\/).slice(-1)[0]
 }
 
@@ -183,6 +184,7 @@ export function particleEmitterConfigToObj(config, obj) {
       if (prop === 'animateScale' ||
           prop === 'accelerate' ||
           prop === 'animateColor' ||
+          prop === 'animateAlpha' ||
           prop === 'emitOnWake') {
         switch (config[prop].toLowerCase()) {
           case '1':
