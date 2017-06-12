@@ -16,8 +16,8 @@
     "minBirthRotation": 0,
     "maxBirthRotation": 0,
     "animateScale": 1,
-    "minBirthScale": 0.07,
-    "maxBirthScale": 0.15,
+    "minBirthScale": 0.7,
+    "maxBirthScale": 1.5,
     "minDeathScale": 0,
     "maxDeathScale": 0,
     "minParticleSpeed": 1,
@@ -29,10 +29,26 @@
     "maxParticleAccelerationY": 0,
     "minParticleAngularSpeed": 0,
     "maxParticleAngularSpeed": 0,
+
+    "animateColor": 0,
+    "minBirthColorR": 255,
+    "minBirthColorG": 255,
+    "minBirthColorB": 255,
+    "maxBirthColorR": 255,
+    "maxBirthColorG": 255,
+    "maxBirthColorB": 255,
+    "minDeathColorR": 255,
+    "minDeathColorG": 255,
+    "minDeathColorB": 255,
+    "maxDeathColorR": 255,
+    "maxDeathColorG": 255,
+    "maxDeathColorB": 255,
+
     "animateAlpha": 0,
     "minBirthAlpha": 255,
     "maxBirthAlpha": 255,
     "minDeathAlpha": 255,
     "maxDeathAlpha": 255,
+
     "emitOnWake": 0
 }
